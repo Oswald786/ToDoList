@@ -1,0 +1,45 @@
+micronaut:
+  application:
+    name: demo
+  security:
+    authentication: bearer
+    token:
+      jwt:
+        signatures:
+          secret:
+            generator:
+              # Consider moving this to an environment variable for security
+              secret: "${JWT_GENERATOR_SIGNATURE_SECRET:AB854675£$j}"
+
+# --- Database & JPA configuration ---
+datasources:
+  default:
+    url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
+    username: ${DB_USERNAME:ETHAN}
+    password: ${DB_PASSWORD:Ethan9901}
+    driverClassName: oracle.jdbc.OracleDriver
+    maximumPoolSize: 5
+    # Optional but recommended timeouts
+    connectionTimeout: 10000
+    idleTimeout: 600000
+    maxLifetime: 1800000
+
+jpa:
+  default:
+    properties:
+      hibernate:
+        # Hibernate 6 dialect for Oracle
+        dialect: org.hibernate.dialect.OracleDialect
+        hbm2ddl:
+          auto: none   # keep schema managed by your SQL scripts
+        format_sql: false
+        show_sql: false
+    # Make sure Micronaut scans the package where your JPA entities live
+    entity-scan:
+      packages:
+        - com.todolist.adaptors.persistence.jpa
+
+# Optional: choose adapter implementation by property (if you later add an HTTP-based adapter)
+adapter:
+  mode: jpa
+

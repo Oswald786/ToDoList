@@ -14,11 +14,46 @@ repositories {
 dependencies {
     annotationProcessor("io.micronaut:micronaut-http-validation")
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
-    implementation("io.micronaut.serde:micronaut-serde-jackson")
+    // ... existing code ...
     compileOnly("io.micronaut:micronaut-http-client")
     runtimeOnly("ch.qos.logback:logback-classic")
     testImplementation("io.micronaut:micronaut-http-client")
+
+    // Core Micronaut runtime (required for application + annotations)
+    implementation("io.micronaut:micronaut-runtime")
+
+    // Micronaut Security (you configured JWT in properties/yaml)
+    implementation("io.micronaut.security:micronaut-security-jwt")
+
+    // Micronaut Data JPA + annotation processor (for @Repository, @Entity usage with Hibernate)
+    annotationProcessor("io.micronaut.data:micronaut-data-processor")
+    implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
+
+    // JDBC connection pool (HikariCP integration)
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+
+    // Oracle JDBC driver (pick one available to you)
+    runtimeOnly("com.oracle.database.jdbc:ojdbc11")
+    // If ojdbc11 isn't resolvable in your environment, try:
+    // runtimeOnly("com.oracle.database.jdbc:ojdbc8")
+
+    // Optional but useful if you use javax/jakarta validation annotations
+    implementation("io.micronaut.validation:micronaut-validation")
+
+    implementation "org.mapstruct:mapstruct:1.6.0"          // or latest
+    annotationProcessor "org.mapstruct:mapstruct-processor:1.6.0"
+    annotationProcessor "io.micronaut:micronaut-inject-java"
+
+    // Lombok (compile-time only + annotation processor)
+    compileOnly("org.projectlombok:lombok:1.18.34")
+    annotationProcessor("org.projectlombok:lombok:1.18.34")
+
+    // Lombok for tests (optional but recommended if you use Lombok in test sources)
+    testCompileOnly("org.projectlombok:lombok:1.18.34")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.34")
+
 }
+
 
 
 application {

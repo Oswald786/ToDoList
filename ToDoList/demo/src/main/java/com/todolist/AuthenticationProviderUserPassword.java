@@ -1,4 +1,4 @@
-package example.micronaut;
+package com.todolist;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
