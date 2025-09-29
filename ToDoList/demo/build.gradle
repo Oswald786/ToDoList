@@ -14,6 +14,7 @@ repositories {
 dependencies {
     annotationProcessor("io.micronaut:micronaut-http-validation")
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    runtimeOnly("org.yaml:snakeyaml")
     // ... existing code ...
     compileOnly("io.micronaut:micronaut-http-client")
     runtimeOnly("ch.qos.logback:logback-classic")
@@ -21,9 +22,6 @@ dependencies {
 
     // Core Micronaut runtime (required for application + annotations)
     implementation("io.micronaut:micronaut-runtime")
-
-    // Micronaut Security (you configured JWT in properties/yaml)
-    implementation("io.micronaut.security:micronaut-security-jwt")
 
     // Micronaut Data JPA + annotation processor (for @Repository, @Entity usage with Hibernate)
     annotationProcessor("io.micronaut.data:micronaut-data-processor")
@@ -33,7 +31,7 @@ dependencies {
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
 
     // Oracle JDBC driver (pick one available to you)
-    runtimeOnly("com.oracle.database.jdbc:ojdbc11")
+    runtimeOnly("com.oracle.database.jdbc:ojdbc11:23.4.0.24.05")
     // If ojdbc11 isn't resolvable in your environment, try:
     // runtimeOnly("com.oracle.database.jdbc:ojdbc8")
 
@@ -52,6 +50,27 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok:1.18.34")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.34")
 
+    implementation("io.micronaut.serde:micronaut-serde-jackson")
+    annotationProcessor("io.micronaut.security:micronaut-security-annotations") // <-- add
+    annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
+    implementation("io.micronaut.reactor:micronaut-reactor") // <-- add
+    implementation("io.micrometer:context-propagation")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testImplementation("org.mockito:mockito-core:5.20.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.20.0")
+
+    testImplementation("io.micronaut.test:micronaut-test-junit5")
+    testAnnotationProcessor("io.micronaut:micronaut-inject-java")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testImplementation("org.mockito:mockito-core:5.20.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.20.0")
+
+
+
+
 }
 
 
@@ -61,7 +80,7 @@ application {
 }
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
