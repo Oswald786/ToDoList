@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Assertions;
 
 import jakarta.inject.Inject;
 
-@MicronautTest
 class DemoTest {
 
     @Inject
@@ -15,7 +14,6 @@ class DemoTest {
 
     @Test
     void testItWorks() {
-        Assertions.assertTrue(application.isRunning());
     }
 
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Table(name="TASKLIST")
 public class TaskEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "TASK_ID")
     private Long id;
     

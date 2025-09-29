@@ -1,8 +1,9 @@
 package com.todolist.Models;
 
+import io.micronaut.serde.annotation.Serdeable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
-
+@Serdeable
 public class taskObjectModel {
         private Long id;
 

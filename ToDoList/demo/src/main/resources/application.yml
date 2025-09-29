@@ -1,22 +1,31 @@
 micronaut:
-  application:
-    name: demo
-  security:
-    authentication: bearer
-    token:
-      jwt:
-        signatures:
-          secret:
-            generator:
-              # Consider moving this to an environment variable for security
-              secret: "${JWT_GENERATOR_SIGNATURE_SECRET:AB854675£$j}"
+  server:
+    cors:
+      enabled: true
+      configurations:
+        dev:
+          allowed-origins:
+            - http://localhost:63342
+          allowed-methods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - OPTIONS
+          allowed-headers:
+            - Content-Type
+            - Authorization
+            - X-Requested-With
+          exposed-headers:
+            - Location
+          allow-credentials: true
+          max-age: 3600
 
-# --- Database & JPA configuration ---
 datasources:
   default:
     url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
-    username: ${DB_USERNAME:ETHAN}
-    password: ${DB_PASSWORD:Ethan9901}
+    username: ETHAN
+    password: Ethan9901
     driverClassName: oracle.jdbc.OracleDriver
     maximumPoolSize: 5
     # Optional but recommended timeouts

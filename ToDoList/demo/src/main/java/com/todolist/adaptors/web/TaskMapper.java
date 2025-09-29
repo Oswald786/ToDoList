@@ -11,5 +11,4 @@ public interface TaskMapper {
     TaskEntity toEntity(taskObjectModel taskObjectModel);
 
     taskObjectModel toModel(TaskEntity taskEntity);
-
 }

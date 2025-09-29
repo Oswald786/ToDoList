@@ -2,6 +2,7 @@ package com.todolist.adaptors.web;
 
 
 import com.todolist.Models.taskObjectModel;
+import com.todolist.Models.updateTaskRequestPackage;
 import com.todolist.adaptors.persistence.jpa.TaskEntity;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
-public class AdaptorController {
+public class AdaptorService {
     @PersistenceContext
     EntityManager entityManager;
 
@@ -22,7 +23,7 @@ public class AdaptorController {
     TaskMapper taskMapper;
 
 
-    public AdaptorController() {
+    public AdaptorService() {
 
     }
 //-----------------------------------------CRUD BASED OPERATIONS BELOW FOR DATABASE INTERACTION----------------------------------------------------
@@ -46,6 +47,7 @@ public class AdaptorController {
         }
         return taskObjectModels;
     }
+
     @Transactional
     public taskObjectModel retrieveTask(Long id){
         TaskEntity entity = entityManager.find(TaskEntity.class, id);
@@ -55,32 +57,32 @@ public class AdaptorController {
 
     //Update
     @Transactional
-    public void updateTask(long id,String fieldToUpdate,String replacementValue) {
-        TaskEntity entity = entityManager.find(TaskEntity.class, id);
+    public void updateTask(updateTaskRequestPackage updateTaskRequestPackage) {
+        TaskEntity entity = entityManager.find(TaskEntity.class, updateTaskRequestPackage.getId());
         if (entity == null) {
-            throw new IllegalArgumentException("Task with id " + id + " does not exist");
+            throw new IllegalArgumentException("Task with id " + updateTaskRequestPackage.getId() + " does not exist");
         }
-        if (fieldToUpdate == null || fieldToUpdate.isBlank()) {
+        if (updateTaskRequestPackage.getFieldToUpdate() == null || updateTaskRequestPackage.getFieldToUpdate().isBlank()) {
             throw new IllegalArgumentException("Field to update cannot be null or blank");
         }
-        if (replacementValue == null || replacementValue.isBlank()) {
+        if (updateTaskRequestPackage.getReplacementValue() == null || updateTaskRequestPackage.getReplacementValue().isBlank()) {
             throw new IllegalArgumentException("Replacement value cannot be null or blank");
         }
-        switch (fieldToUpdate) {
+        switch (updateTaskRequestPackage.getFieldToUpdate()) {
             case "taskName":
-                entity.setTaskName(replacementValue);
+                entity.setTaskName(updateTaskRequestPackage.getReplacementValue());
                 break;
             case "taskType":
-                entity.setTaskType(replacementValue);
+                entity.setTaskType(updateTaskRequestPackage.getReplacementValue());
                 break;
             case "taskLevel":
-                entity.setTaskLevel(replacementValue);
+                entity.setTaskLevel(updateTaskRequestPackage.getReplacementValue());
                 break;
             case "taskDescription":
-                entity.setTaskDescription(replacementValue);
+                entity.setTaskDescription(updateTaskRequestPackage.getReplacementValue());
                 break;
             default:
-                throw new IllegalArgumentException("Field " + fieldToUpdate + " does not exist");
+                throw new IllegalArgumentException("Field " + updateTaskRequestPackage.getFieldToUpdate() + " does not exist");
         }
     }
     //Delete
@@ -91,5 +93,21 @@ public class AdaptorController {
             throw new IllegalArgumentException("Task with id " + id + " does not exist");
         }
         entityManager.remove(entity);
+    }
+
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+
+    public TaskMapper getTaskMapper() {
+        return taskMapper;
+    }
+
+    public void setTaskMapper(TaskMapper taskMapper) {
+        this.taskMapper = taskMapper;
+    }
+
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 }
