@@ -8,6 +8,9 @@ public class taskObjectModel {
         private Long id;
 
 
+        private String taskOwnerId;
+
+
         private String taskName;
 
 
@@ -19,8 +22,9 @@ public class taskObjectModel {
 
         private String taskDescription;
 
-    public taskObjectModel(Long id, String taskName, String taskType, String taskLevel, String taskDescription) {
+    public taskObjectModel(Long id,String taskOwner, String taskName, String taskType, String taskLevel, String taskDescription) {
         this.id = id;
+        this.taskOwnerId = taskOwner;
         this.taskName = taskName;
         this.taskType = taskType;
         this.taskLevel = taskLevel;
@@ -28,6 +32,14 @@ public class taskObjectModel {
     }
 
     public taskObjectModel() {
+    }
+
+    public String getTaskOwner() {
+        return taskOwnerId;
+    }
+
+    public void setTaskOwner(String taskOwner) {
+        this.taskOwnerId = taskOwner;
     }
 
     public String getTaskType() {

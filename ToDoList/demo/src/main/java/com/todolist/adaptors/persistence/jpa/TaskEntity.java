@@ -12,11 +12,14 @@ public class TaskEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "TASK_ID")
     private Long id;
-    
+
+    @Column(name = "TASK_OWNER")
+    private String taskOwnerId;
+
     @Column(name = "TASK_NAME")
     private String taskName;
 
-    @Column(name = "TASKTYPE")
+    @Column(name = "TASK_TYPE")
     private String taskType;
 
     @Column(name = "TASK_LEVEL")
@@ -25,6 +28,14 @@ public class TaskEntity {
     @Column(name = "TASK_DESCRIPTION")
     private String taskDescription;
 
+    //need a foreign key here this will be for the task owners id
+    public String getTaskOwnerId() {
+        return taskOwnerId;
+    }
+
+    public void setTaskOwnerId(String taskOwnerId) {
+        this.taskOwnerId = taskOwnerId;
+    }
 
     public Long getId() {
         return id;

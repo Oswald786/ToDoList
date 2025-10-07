@@ -1,0 +1,54 @@
+micronaut:
+  server:
+    cors:
+      enabled: true
+      configurations:
+        dev:
+          allowed-origins:
+            - http://localhost:63342
+          allowed-methods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - OPTIONS
+          allowed-headers:
+            - Content-Type
+            - Authorization
+            - X-Requested-With
+          exposed-headers:
+            - Location
+          allow-credentials: true
+          max-age: 3600
+
+datasources:
+  default:
+    url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
+    username: ETHAN
+    password: Ethan9901
+    driverClassName: oracle.jdbc.OracleDriver
+    maximumPoolSize: 5
+    # Optional but recommended timeouts
+    connectionTimeout: 10000
+    idleTimeout: 600000
+    maxLifetime: 1800000
+
+jpa:
+  default:
+    properties:
+      hibernate:
+        # Hibernate 6 dialect for Oracle
+        dialect: org.hibernate.dialect.OracleDialect
+        hbm2ddl:
+          auto: none   # keep schema managed by your SQL scripts
+        format_sql: false
+        show_sql: false
+    # Make sure Micronaut scans the package where your JPA entities live
+    entity-scan:
+      packages:
+        - com.todolist.adaptors.persistence.jpa
+
+# Optional: choose adapter implementation by property (if you later add an HTTP-based adapter)
+adapter:
+  mode: jpa
+
