@@ -148,3 +148,40 @@ async function updateTask(taskID,CatagoryToUpdate,ReplacementValue) {
     console.log(response.statusText);
     console.log(response.json())
 }
+
+//Register Page Content Goes Here
+
+function CheckTermsAndConditionsChecked() {return document.getElementById("termsAndConditions").checked;}
+
+function CheckPasswordMatch() {
+    let password = document.getElementById("password").value;
+    let confirmPassword = document.getElementById("confirmPassword").value;
+    return password === confirmPassword;
+}
+
+function CheckPasswordLength() {return document.getElementById("password").value.length >= 8;}
+
+function checkValidUsername() {return document.getElementById("username").value.length >= 3;}
+
+function checkValidEmail() {return document.getElementById("email").value.length >= 3;}
+
+function checkAllFieldsFilled() {
+    if (CheckTermsAndConditionsChecked() === false) {
+        alert("You must agree to the terms and conditions");
+        return false;
+    }
+    if (CheckPasswordMatch() === false) {
+        alert("Passwords do not match");
+        return false;
+    }
+    if (CheckPasswordLength() === false) {
+        alert("Password must be at least 8 characters long");
+    }
+    if (checkValidUsername() === false) {
+        alert("Username must be at least 3 characters long");
+    }
+    if (checkValidEmail() === false) {
+        alert("Email must be at least 3 characters long");
+    }
+    return CheckTermsAndConditionsChecked() && CheckPasswordMatch() && CheckPasswordLength() && checkValidUsername() && checkValidEmail();
+}

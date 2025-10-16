@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Register - Task Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script defer src="./js/ToDoListJava.js"></script>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* Matching theme from Index.html */
+        :root {
+            --nf-accent: #0d6efd;
+        }
+        body {
+            background: #0b1220;
+            color: #e0e6f0;
+        }
+        .card {
+            background: #111a2b;
+            border: 1px solid rgba(255,255,255,.08);
+        }
+        .form-control, .form-select {
+            background: #0e1728;
+            color: #e0e6f0;
+            border-color: rgba(255,255,255,.12);
+        }
+        .form-control::placeholder { color: #9fb0c3; }
+        .form-control:focus {
+            background: #0e1728;
+            color: #e0e6f0;
+            border-color: var(--nf-accent);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        .form-label {
+            color: #ffffff;
+        }
+        .form-check-label {
+            color: #ffffff;
+        }
+        .btn-primary {
+            background-color: var(--nf-accent);
+            border-color: var(--nf-accent);
+        }
+        .text-muted { color: #9fb0c3 !important; }
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        .register-card {
+            max-width: 500px;
+            width: 100%;
+        }
+        a {
+            color: var(--nf-accent);
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <div class="register-card">
+        <div class="text-center mb-4">
+            <h1 class="h3">The Task Game</h1>
+            <p class="text-muted">Create your account</p>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form id="registerForm">
+                    <div class="mb-3">
+                        <label for="registerUsername" class="form-label">Username</label>
+                        <input type="text" id="registerUsername" class="form-control"
+                               placeholder="Choose a username" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="registerEmail" class="form-label">Email address</label>
+                        <input type="email" id="registerEmail" class="form-control"
+                               placeholder="your.email@example.com" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="registerPassword" class="form-label">Password</label>
+                        <input type="password" id="registerPassword" class="form-control"
+                               placeholder="Create a strong password" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="registerConfirmPassword" class="form-label">Confirm Password</label>
+                        <input type="password" id="registerConfirmPassword" class="form-control"
+                               placeholder="Re-enter your password" required>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" id="registerTerms" class="form-check-input" required>
+                        <label class="form-check-label" for="registerTerms">
+                            I agree to the Terms & Conditions
+                        </label>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" id="registerButton" class="btn btn-primary btn-lg">
+                            Create Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <p class="text-muted mb-0">
+                Already have an account?
+                <a href="LogInPage.html">Sign in</a>
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -2,7 +2,6 @@ package com.todolist.Services;
 
 import com.todolist.Models.taskObjectModel;
 import com.todolist.Models.updateTaskRequestPackage;
-import com.todolist.adaptors.persistence.jpa.TaskEntity;
 import com.todolist.adaptors.web.AdaptorService;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;

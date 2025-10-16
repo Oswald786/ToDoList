@@ -2,18 +2,19 @@ package com.todolist.Models;
 
 import lombok.Getter;
 import lombok.Setter;
-
+@Getter
+@Setter
 public class userDetailsModel {
-    @Getter @Setter
+
     String username;
 
-    @Getter @Setter
+
     String password;
 
-    @Getter @Setter
+
     String role;
 
-    @Getter @Setter
+
     String email;
 
 
