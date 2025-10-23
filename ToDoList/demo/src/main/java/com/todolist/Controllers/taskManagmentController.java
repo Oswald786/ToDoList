@@ -16,6 +16,8 @@ public class taskManagmentController {
     @Inject
     AdaptorService adaptorService;
 
+    //all fot hese methods need the task owner here as well to ensure that the task is taken or altered by the owner
+
     @Post("/createTask")
     public void createTask(taskObjectModel taskObjectModel){
         this.adaptorService.createTask(taskObjectModel);

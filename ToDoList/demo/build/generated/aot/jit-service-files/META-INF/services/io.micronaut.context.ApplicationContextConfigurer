@@ -1,0 +1,3 @@
+com.todolist.DeducedEnvironmentConfigurer
+com.todolist.NettyPropertiesAOTContextConfigurer
+com.todolist.AOTApplicationContextConfigurer

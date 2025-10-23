@@ -2,7 +2,7 @@ package com.todolist.Models;
 
 import io.micronaut.serde.annotation.Serdeable;
 
-@Serdeable.Serializable
+@Serdeable
 public class updateTaskRequestPackage {
 
     long id;

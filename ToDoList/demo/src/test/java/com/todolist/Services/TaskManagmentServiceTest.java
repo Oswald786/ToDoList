@@ -45,23 +45,23 @@ class TaskManagmentServiceTest {
     @BeforeEach
     void setUp() {
         // Valid baseline
-        valid = new taskObjectModel(1L, "Test Task", "Test Type", "Test Level", "Test Description");
+        valid = new taskObjectModel(1L,"ETHAN", "Test Task", "Test Type", "Test Level", "Test Description");
 
         // Invalid: task name
-        invalidNameNull  = new taskObjectModel(2L, null,        "Test Type", "Test Level", "Test Description");
-        invalidNameEmpty = new taskObjectModel(3L, "",          "Test Type", "Test Level", "Test Description");
+        invalidNameNull  = new taskObjectModel(2L,"ETHAN", null,        "Test Type", "Test Level", "Test Description");
+        invalidNameEmpty = new taskObjectModel(3L,"ETHAN", "",          "Test Type", "Test Level", "Test Description");
 
         // Invalid: task type
-        invalidTypeNull  = new taskObjectModel(4L, "Test Task", null,        "Test Level", "Test Description");
-        invalidTypeEmpty = new taskObjectModel(5L, "Test Task", "",          "Test Level", "Test Description");
+        invalidTypeNull  = new taskObjectModel(4L,"ETHAN", "Test Task", null,        "Test Level", "Test Description");
+        invalidTypeEmpty = new taskObjectModel(5L,"ETHAN", "Test Task", "",          "Test Level", "Test Description");
 
         // Invalid: task level
-        invalidLevelNull  = new taskObjectModel(6L, "Test Task", "Test Type", null,        "Test Description");
-        invalidLevelEmpty = new taskObjectModel(7L, "Test Task", "Test Type", "",          "Test Description");
+        invalidLevelNull  = new taskObjectModel(6L,"ETHAN", "Test Task", "Test Type", null,        "Test Description");
+        invalidLevelEmpty = new taskObjectModel(7L,"ETHAN", "Test Task", "Test Type", "",          "Test Description");
 
         // Invalid: task description
-        invalidDescNull  = new taskObjectModel(8L, "Test Task", "Test Type", "Test Level", null);
-        invalidDescEmpty = new taskObjectModel(9L, "Test Task", "Test Type", "Test Level", "");
+        invalidDescNull  = new taskObjectModel(8L,"ETHAN", "Test Task", "Test Type", "Test Level", null);
+        invalidDescEmpty = new taskObjectModel(9L,"ETHAN", "Test Task", "Test Type", "Test Level", "");
 
         // Convenience collection
         allInvalid = java.util.List.of(
@@ -363,6 +363,7 @@ class TaskManagmentServiceTest {
 
         TaskEntity t1 = new TaskEntity();
         t1.setId(1L);
+        t1.setTaskOwnerId("ETHAN");
         t1.setTaskName("Tidy Room");
         t1.setTaskType("Chore");
         t1.setTaskLevel("Easy");
@@ -371,6 +372,7 @@ class TaskManagmentServiceTest {
 
         TaskEntity t2 = new TaskEntity();
         t2.setId(2L);
+        t2.setTaskOwnerId("ETHAN");
         t2.setTaskName("Grocery Shopping");
         t2.setTaskType("Errand");
         t2.setTaskLevel("Medium");
@@ -379,6 +381,7 @@ class TaskManagmentServiceTest {
 
         TaskEntity t3 = new TaskEntity();
         t3.setId(3L);
+        t3.setTaskOwnerId("ETHAN");
         t3.setTaskName("Write Report");
         t3.setTaskType("Work");
         t3.setTaskLevel("Hard");

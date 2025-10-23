@@ -68,6 +68,13 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.20.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.20.0")
 
+    implementation("io.micronaut.security:micronaut-security-jwt")
+
+
+    implementation("org.springframework.security:spring-security-crypto:6.1.4")
+    implementation("commons-logging:commons-logging:1.2")
+
+
 
 
 

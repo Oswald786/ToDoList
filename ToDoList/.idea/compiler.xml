@@ -71,6 +71,7 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.38/57f8f5e02e92a30fd21b80cbd426a4172b5f8e29/lombok-1.18.38.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.micronaut.data/micronaut-data-processor/4.13.4/8a2c79f7ee13fba71f628063602aeacd5a1d89a4/micronaut-data-processor-4.13.4.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.micronaut.security/micronaut-security-annotations/4.13.1/660e18d6ca70c2294d84b337ab1a3fede46c0d4/micronaut-security-annotations-4.13.1.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.micronaut.serde/micronaut-serde-processor/2.15.1/f29a8f1d510ea59fc8154dd0018adeb8a1564466/micronaut-serde-processor-2.15.1.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.micronaut.validation/micronaut-validation-processor/4.10.0/6ac2c0d8f3c201df639b12d5951e6caa1a91b801/micronaut-validation-processor-4.10.0.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.micronaut.data/micronaut-data-model/4.13.4/99ddbbbdcaad97d9a4b1a15359fec8f5ab3ec7a6/micronaut-data-model-4.13.4.jar" />
