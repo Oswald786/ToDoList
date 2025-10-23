@@ -28,7 +28,7 @@ micronaut:
         signatures:
           secret:
             generator:
-              secret: '"${JWT_GENERATOR_SIGNATURE_SECRET:BatmanIsAwesome}"'
+              secret: '"${JWT_GENERATOR_SIGNATURE_SECRET:7K9mP2nQ8rT5vW3xZ6aB1cD4eF7gH0jL3mN6pR9sU2wX5yA8bC1dE4fG7hJ0kM3n}"'
         generator:
           access-token:
             expiration: 5m

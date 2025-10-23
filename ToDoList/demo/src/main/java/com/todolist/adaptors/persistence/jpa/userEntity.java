@@ -11,13 +11,14 @@ import lombok.Setter;
 @Entity
 @Table(name="USERS")
 public class userEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    //need to work on getitng the id randomly hen creating objects
     @Column(name = "USER_ID")
     @Getter
     @Setter
     private Long id;
 
+    @Id
     @Column(name = "USERNAME")
     @Getter
     @Setter

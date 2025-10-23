@@ -3,7 +3,12 @@ package com.todolist.Models;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.Setter;
+
 @Serdeable
+@Getter
+@Setter
 public class taskObjectModel {
         private Long id;
 
@@ -32,53 +37,5 @@ public class taskObjectModel {
     }
 
     public taskObjectModel() {
-    }
-
-    public String getTaskOwner() {
-        return taskOwnerId;
-    }
-
-    public void setTaskOwner(String taskOwner) {
-        this.taskOwnerId = taskOwner;
-    }
-
-    public String getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(String taskType) {
-        this.taskType = taskType;
-    }
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTaskLevel() {
-        return taskLevel;
-    }
-
-    public void setTaskLevel(String taskLevel) {
-        this.taskLevel = taskLevel;
-    }
-
-    public String getTaskDescription() {
-        return taskDescription;
-    }
-
-    public void setTaskDescription(String taskDescription) {
-        this.taskDescription = taskDescription;
     }
 }

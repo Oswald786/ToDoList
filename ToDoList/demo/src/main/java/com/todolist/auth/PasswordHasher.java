@@ -1,8 +1,9 @@
 package com.todolist.auth;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.springframework.security.crypto.bcrypt.*;
-
+@Singleton
 public class PasswordHasher {
 
     private static final BCryptPasswordEncoder passwordHasher = new BCryptPasswordEncoder();

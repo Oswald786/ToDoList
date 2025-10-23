@@ -1,12 +1,15 @@
 package com.todolist.Models;
 
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Getter;
 import lombok.Setter;
 @Getter
 @Setter
+@Serdeable
 public class userDetailsModel {
+    long id;
 
-    String username;
+    String userName;
 
 
     String password;
@@ -15,16 +18,16 @@ public class userDetailsModel {
     String role;
 
 
-    String email;
+    String EMAIL;
 
 
 
 
-    public userDetailsModel(String username, String password, String role, String email) {
-        this.username = username;
+    public userDetailsModel(String userName, String password, String role, String EMAIL) {
+        this.userName = userName;
         this.password = password;
         this.role = role;
-        this.email = email;
+        this.EMAIL = EMAIL;
     }
 
     public userDetailsModel() {
