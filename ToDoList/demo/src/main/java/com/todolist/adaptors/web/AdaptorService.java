@@ -55,6 +55,21 @@ public class AdaptorService {
     }
 
     @Transactional
+    public ArrayList<taskObjectModel> fetchAllTasksByOwner(String taskOwnerId){
+        ArrayList<taskObjectModel> taskObjectModelsOwned = new ArrayList<>();
+
+        //need to add a parameter for the task owner id here to ensure that only tasks owned by the owner are returned
+        //also add some error handling and soem catches for if this is not the case
+        TypedQuery<TaskEntity> query = entityManager.createQuery("SELECT t FROM TaskEntity t WHERE t.taskOwnerId = :owner", TaskEntity.class);
+        query.setParameter("owner", taskOwnerId);
+        List<TaskEntity> resultList = query.getResultList();
+        for(TaskEntity taskEntity: resultList){
+            taskObjectModelsOwned.add(taskMapper.toModel(taskEntity));
+        }
+        return taskObjectModelsOwned;
+    }
+
+    @Transactional
     public taskObjectModel retrieveTask(Long id){
         //need to add a parameter for the task owner id here to ensure that only tasks owned by the owner are returned
         //also add some error handling and soem catches for if this is not the case

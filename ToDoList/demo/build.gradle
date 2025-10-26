@@ -74,10 +74,6 @@ dependencies {
     implementation("org.springframework.security:spring-security-crypto:6.1.4")
     implementation("commons-logging:commons-logging:1.2")
 
-
-
-
-
 }
 
 

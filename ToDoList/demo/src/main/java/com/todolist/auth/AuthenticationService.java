@@ -12,6 +12,8 @@ import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
+import java.util.List;
+
 @Singleton
 public class AuthenticationService<B> implements HttpRequestAuthenticationProvider<B>{
 
@@ -57,7 +59,7 @@ public class AuthenticationService<B> implements HttpRequestAuthenticationProvid
             if(passwordHasher.checkPassword(password, user.getPassword())){
                 //If the password matches then return a success response
                 System.out.println("Authenticating user success");
-                return AuthenticationResponse.success(username);
+                return AuthenticationResponse.success(username, List.of(user.getRole()));
             }else{
                 //If the password does not match then return a failure response
                 System.out.println("Authenticating user failure");
