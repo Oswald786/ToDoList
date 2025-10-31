@@ -10,6 +10,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,8 @@ public class AdaptorService {
 
     @Inject
     TaskMapper taskMapper;
+
+    private static final Logger log = LoggerFactory.getLogger(AdaptorService.class);
 
 
 
@@ -72,9 +76,16 @@ public class AdaptorService {
     @Transactional
     public taskObjectModel retrieveTask(Long id){
         //need to add a parameter for the task owner id here to ensure that only tasks owned by the owner are returned
-        //also add some error handling and soem catches for if this is not the case
-        TaskEntity entity = entityManager.find(TaskEntity.class, id);
-        return taskMapper.toModel(entity);
+        //also add some error handling and some catches for if this is not the case
+            TaskEntity entity = entityManager.find(TaskEntity.class, id);
+
+            if(entity == null){
+                log.error("Task with id " + id + " does not exist illegal argument exception thrown");
+                throw new IllegalArgumentException("Task with id " + id + " does not exist");
+            }
+
+            return taskMapper.toModel(entity);
+
     }
 
 
