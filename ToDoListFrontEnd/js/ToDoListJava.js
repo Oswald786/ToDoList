@@ -5,8 +5,16 @@ window.onload = GetTasks;
 async function GetTasks() {
     try {
         console.log("Getting Tasks");
+        let token = localStorage.getItem("jwtToken");
         const url = "http://localhost:8080/v1taskManagmentController/getTasks";
-        const response = await fetch(url);
+        const response = await fetch(url,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
         const data = await response.json();
 
         const taskListDomElement = document.getElementById("taskListDisplay");
@@ -71,7 +79,8 @@ async function AddTask() {
     let responseText = await fetch(url, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("jwtToken")}`
         },
         body: JSON.stringify({
             taskObjectModel : {
@@ -100,7 +109,8 @@ async function removeTask(taskID) {
     let responseText = await fetch(url, {
         method: "DELETE",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("jwtToken")}`
         },
         body: JSON.stringify({
             "id" : taskID
@@ -126,7 +136,8 @@ async function updateTask(taskID,CatagoryToUpdate,ReplacementValue) {
         {
             method: "POST",
             headers : {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("jwtToken")}`
             },
             body: JSON.stringify({
                 updateTaskRequestPackage :   {

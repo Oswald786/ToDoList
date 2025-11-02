@@ -6,6 +6,8 @@ import com.todolist.adaptors.persistence.jpa.TaskEntity;
 import com.todolist.adaptors.web.AdaptorService;
 import com.todolist.adaptors.web.TaskMapper;
 import com.todolist.adaptors.web.TaskMapperImpl;
+import com.todolist.auth.AuthenticationService;
+import io.micronaut.security.authentication.Authentication;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -22,7 +24,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-
+@MicronautTest
+@DisplayName("TaskManagmentService Authentication Tests")
 class TaskManagmentServiceTest {
 
     taskObjectModel valid;
@@ -40,6 +43,8 @@ class TaskManagmentServiceTest {
     taskObjectModel invalidDescEmpty;
 
     java.util.List<taskObjectModel> allInvalid;
+
+    Authentication mockAuthentication;
 
 
     @BeforeEach
@@ -70,6 +75,9 @@ class TaskManagmentServiceTest {
                 invalidLevelNull, invalidLevelEmpty,
                 invalidDescNull, invalidDescEmpty
         );
+
+        // Authentication Examples
+        this.mockAuthentication =  Authentication.build("ETHAN",List.of("ADMIN","USER"));
     }
 
     @Test
@@ -83,9 +91,10 @@ class TaskManagmentServiceTest {
         taskObjectModel.setTaskDescription("Test Description");
         taskObjectModel.setTaskLevel("Test Level");
         //Act
-        service.createTask(taskObjectModel);
+
+        service.createTask(taskObjectModel, mockAuthentication);
         //Assert
-        Mockito.verify(service).createTask(taskObjectModel);
+        Mockito.verify(service).createTask(taskObjectModel, mockAuthentication);
         Mockito.verifyNoMoreInteractions(service);
     }
 
@@ -103,15 +112,15 @@ class TaskManagmentServiceTest {
 
 
         //Act
-        boolean result = service.validateTaskObjectModel(CorrecttaskObjectModel);
-        boolean result2 = service.validateTaskObjectModel(invalidNameNull);
-        boolean result3 = service.validateTaskObjectModel(invalidNameEmpty);
-        boolean result4 = service.validateTaskObjectModel(invalidTypeNull);
-        boolean result5 = service.validateTaskObjectModel(invalidTypeEmpty);
-        boolean result6 = service.validateTaskObjectModel(invalidLevelNull);
-        boolean result7 = service.validateTaskObjectModel(invalidLevelEmpty);
-        boolean result8 = service.validateTaskObjectModel(invalidDescNull);
-        boolean result9 = service.validateTaskObjectModel(invalidDescEmpty);
+        boolean result = service.validateTaskObjectModel(CorrecttaskObjectModel,this.mockAuthentication);
+        boolean result2 = service.validateTaskObjectModel(invalidNameNull,this.mockAuthentication);
+        boolean result3 = service.validateTaskObjectModel(invalidNameEmpty,this.mockAuthentication);
+        boolean result4 = service.validateTaskObjectModel(invalidTypeNull,this.mockAuthentication);
+        boolean result5 = service.validateTaskObjectModel(invalidTypeEmpty,this.mockAuthentication);
+        boolean result6 = service.validateTaskObjectModel(invalidLevelNull,this.mockAuthentication);
+        boolean result7 = service.validateTaskObjectModel(invalidLevelEmpty,this.mockAuthentication);
+        boolean result8 = service.validateTaskObjectModel(invalidDescNull,this.mockAuthentication);
+        boolean result9 = service.validateTaskObjectModel(invalidDescEmpty,this.mockAuthentication);
         //Assert
         assertTrue(result);
         assertFalse(result2);
@@ -123,7 +132,7 @@ class TaskManagmentServiceTest {
         assertFalse(result8);
         assertFalse(result9);
 
-        Mockito.verify(service,Mockito.atMost(9)).validateTaskObjectModel(CorrecttaskObjectModel);
+        Mockito.verify(service,Mockito.atMost(9)).validateTaskObjectModel(CorrecttaskObjectModel,this.mockAuthentication);
 
     }
 
@@ -142,7 +151,7 @@ class TaskManagmentServiceTest {
 
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            service.updateTask(updateTaskRequestPackage);
+            service.updateTask(updateTaskRequestPackage,this.mockAuthentication);
         });
 
     }
@@ -163,7 +172,7 @@ class TaskManagmentServiceTest {
 
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            service.updateTask(req);
+            service.updateTask(req,this.mockAuthentication);
         });
     }
 
@@ -184,7 +193,7 @@ class TaskManagmentServiceTest {
 
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            service.updateTask(req);
+            service.updateTask(req,this.mockAuthentication);
         });
 
     }
@@ -193,169 +202,83 @@ class TaskManagmentServiceTest {
     @Test
     @DisplayName("Test updateTask updates task name correctly")
     void testUpdateTaskUpdatesTaskNameCorrectly() {
-        //Arrange
+        // Arrange
         TaskManagmentService service = new TaskManagmentService();
-        service.adaptorService = new AdaptorService();
-        EntityManager entityManager = mock(EntityManager.class);
-        service.adaptorService.setEntityManager(entityManager);
-        updateTaskRequestPackage req = new updateTaskRequestPackage(1L, "Tidy Room", "taskName");
-        TaskEntity taskEntity = spy(new TaskEntity());
-        taskEntity.setId(1L);
-        taskEntity.setTaskName("Fake Name");
-        taskEntity.setTaskType("Fake Type");
-        taskEntity.setTaskLevel("Fake Level");
-        taskEntity.setTaskDescription("Fake Description");
+        AdaptorService adaptorService = mock(AdaptorService.class);
+        service.adaptorService = adaptorService;
 
+        updateTaskRequestPackage req = new updateTaskRequestPackage(1, "Tidy Room", "taskName");
 
+        taskObjectModel fakeTask = new taskObjectModel();
+        fakeTask.setId(1L);
+        fakeTask.setTaskOwnerId("ETHAN");
+        fakeTask.setTaskName("Old Task");
 
+        when(adaptorService.retrieveTask(1L)).thenReturn(fakeTask);
+        doNothing().when(adaptorService).updateTask(req);
 
-        when(entityManager.find(eq(TaskEntity.class), anyLong())).thenReturn(taskEntity);
+        // Act
+        service.updateTask(req, this.mockAuthentication);
 
-        //Act
-        service.updateTask(req);
-        //Assert
-        Mockito.verify(taskEntity).setTaskName("Tidy Room");
-        assertEquals("Tidy Room", taskEntity.getTaskName());
+        // Assert
+        verify(adaptorService, times(1)).retrieveTask(1L);
+        verify(adaptorService, times(1)).updateTask(req);
 
-    }
-
-    @Test
-    @DisplayName("Test updateTask updates task type correctly")
-    void testUpdateTaskUpdatesTaskTypeCorrectly() {
-        //Arrange
-        TaskManagmentService service = new TaskManagmentService();
-        service.adaptorService = new AdaptorService();
-        EntityManager entityManager = mock(EntityManager.class);
-        service.adaptorService.setEntityManager(entityManager);
-        updateTaskRequestPackage req = new updateTaskRequestPackage(1L, "Cleaning", "taskType");
-        TaskEntity taskEntity = spy(new TaskEntity());
-        taskEntity.setId(1L);
-        taskEntity.setTaskName("Fake Name");
-        taskEntity.setTaskType("Fake Type");
-        taskEntity.setTaskLevel("Fake Level");
-        taskEntity.setTaskDescription("Fake Description");
-
-        when(entityManager.find(eq(TaskEntity.class), anyLong())).thenReturn(taskEntity);
-
-        //Act
-        service.updateTask(req);
-        //Assert
-        Mockito.verify(taskEntity).setTaskType("Cleaning");
-        assertEquals("Cleaning", taskEntity.getTaskType());
-    }
-
-    @Test
-    @DisplayName("Test updateTask updates task level correctly")
-    void testUpdateTaskUpdatesTaskLevelCorrectly() {
-        //Arrange
-        TaskManagmentService service = new TaskManagmentService();
-        service.adaptorService = new AdaptorService();
-        EntityManager entityManager = mock(EntityManager.class);
-        service.adaptorService.setEntityManager(entityManager);
-        updateTaskRequestPackage req = new updateTaskRequestPackage(1L, "8", "taskLevel");
-        TaskEntity taskEntity = spy(new TaskEntity());
-        taskEntity.setId(1L);
-        taskEntity.setTaskName("Fake Name");
-        taskEntity.setTaskType("Fake Type");
-        taskEntity.setTaskLevel("Fake Level");
-        taskEntity.setTaskDescription("Fake Description");
-
-        when(entityManager.find(eq(TaskEntity.class), anyLong())).thenReturn(taskEntity);
-
-        //Act
-        service.updateTask(req);
-        //Assert
-        Mockito.verify(taskEntity).setTaskLevel("8");
-        assertEquals("8", taskEntity.getTaskLevel());
-    }
-
-    @Test
-    @DisplayName("Test updateTask updates task description correctly")
-    void testUpdateTaskUpdatesTaskDescriptionCorrectly() {
-        //Arrange
-        TaskManagmentService service = new TaskManagmentService();
-        service.adaptorService = new AdaptorService();
-        EntityManager entityManager = mock(EntityManager.class);
-        service.adaptorService.setEntityManager(entityManager);
-        updateTaskRequestPackage req = new updateTaskRequestPackage(1L, "get the bins out", "taskDescription");
-        TaskEntity taskEntity = spy(new TaskEntity());
-        taskEntity.setId(1L);
-        taskEntity.setTaskName("Fake Name");
-        taskEntity.setTaskType("Fake Type");
-        taskEntity.setTaskLevel("Fake Level");
-        taskEntity.setTaskDescription("Fake Description");
-
-        when(entityManager.find(eq(TaskEntity.class), anyLong())).thenReturn(taskEntity);
-
-        //Act
-        service.updateTask(req);
-        //Assert
-        Mockito.verify(taskEntity).setTaskDescription("get the bins out");
-        assertEquals("get the bins out", taskEntity.getTaskDescription());
     }
 
     @Test
     @DisplayName("Test updateTask throws error when entity not found")
     void deleteTask() {
-
-        //Arrange
+        // Arrange
         TaskManagmentService service = new TaskManagmentService();
-        service.adaptorService = new AdaptorService();
-        EntityManager entityManager = spy(EntityManager.class);
-        service.adaptorService.setEntityManager(entityManager);
-        updateTaskRequestPackage req = new updateTaskRequestPackage(1L, "get the bins out", "taskDescription");
-        TaskEntity taskEntity = spy(new TaskEntity());
-        taskEntity.setId(1L);
-        taskEntity.setTaskName("Fake Name");
-        taskEntity.setTaskType("Fake Type");
-        taskEntity.setTaskLevel("Fake Level");
-        taskEntity.setTaskDescription("Fake Description");
+        AdaptorService adaptorService = mock(AdaptorService.class);
+        service.adaptorService = adaptorService;
 
-        when(entityManager.find(eq(TaskEntity.class), anyLong())).thenReturn(taskEntity);
+        long taskId = 1L;
+        taskObjectModel fakeTask = new taskObjectModel();
+        fakeTask.setId(taskId);
+        fakeTask.setTaskOwnerId("ETHAN");
 
-        //Act
-        service.deleteTask(1L);
-        //Assert
-        Mockito.verify(entityManager).remove(taskEntity);
+        when(adaptorService.retrieveTask(taskId)).thenReturn(fakeTask);
+        doNothing().when(adaptorService).deleteTask(taskId);
+
+        // Act
+        service.deleteTask(taskId, this.mockAuthentication);
+
+        // Assert
+        verify(adaptorService, times(1)).retrieveTask(taskId);
+        verify(adaptorService, times(1)).deleteTask(taskId);
     }
 
     @Test
     @DisplayName("Tests all tasks are fetched correctly")
     void fetchAllTasks() {
-        List<TaskEntity> resultList = getTaskEntities();
+        // Arrange
         TaskManagmentService service = new TaskManagmentService();
-        service.adaptorService = new AdaptorService();
-        EntityManager entityManager = spy(EntityManager.class);
-        service.adaptorService.setEntityManager(entityManager);
-        TaskMapper taskMapper = new TaskMapperImpl();
-        service.adaptorService.setTaskMapper(taskMapper);
+        AdaptorService adaptorService = mock(AdaptorService.class);
+        service.adaptorService = adaptorService;
 
-        TypedQuery<TaskEntity> query = mock(TypedQuery.class);
-        when(entityManager.createQuery("SELECT t FROM TaskEntity t", TaskEntity.class)).thenReturn(query);
-        when(query.getResultList()).thenReturn(resultList);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn("ETHAN");
 
+        ArrayList<taskObjectModel> expectedList = new ArrayList<>();
+        expectedList.add(new taskObjectModel(1L, "ETHAN", "Tidy Room", "Chore", "Easy", "Pick up clothes and make the bed"));
+        expectedList.add(new taskObjectModel(2L, "ETHAN", "Grocery Shopping", "Errand", "Medium", "Buy milk, eggs, bread"));
+        expectedList.add(new taskObjectModel(3L, "ETHAN", "Write Report", "Work", "Hard", "Summarize Q3 project outcomes"));
 
-        //act
-        ArrayList<taskObjectModel> returnedList = service.fetchAllTasks();
+        when(adaptorService.fetchAllTasksByOwner("ETHAN")).thenReturn(expectedList);
 
-        //assert
-        assertEquals(3, returnedList.size());
-        assertEquals(resultList.get(0).getTaskName(), returnedList.get(0).getTaskName());
-        assertEquals(resultList.get(1).getTaskName(), returnedList.get(1).getTaskName());
-        assertEquals(resultList.get(2).getTaskName(), returnedList.get(2).getTaskName());
-        assertEquals(resultList.get(0).getTaskType(), returnedList.get(0).getTaskType());
-        assertEquals(resultList.get(1).getTaskType(), returnedList.get(1).getTaskType());
-        assertEquals(resultList.get(2).getTaskType(), returnedList.get(2).getTaskType());
-        assertEquals(resultList.get(0).getTaskLevel(), returnedList.get(0).getTaskLevel());
-        assertEquals(resultList.get(1).getTaskLevel(), returnedList.get(1).getTaskLevel());
-        assertEquals(resultList.get(2).getTaskLevel(), returnedList.get(2).getTaskLevel());
-        assertEquals(resultList.get(0).getTaskDescription(), returnedList.get(0).getTaskDescription());
-        assertEquals(resultList.get(1).getTaskDescription(), returnedList.get(1).getTaskDescription());
-        assertEquals(resultList.get(2).getTaskDescription(), returnedList.get(2).getTaskDescription());
-        assertEquals(resultList.get(0).getId(), returnedList.get(0).getId());
-        assertEquals(resultList.get(1).getId(), returnedList.get(1).getId());
-        assertEquals(resultList.get(2).getId(), returnedList.get(2).getId());
-        Mockito.verify(entityManager).createQuery("SELECT t FROM TaskEntity t", TaskEntity.class);
+        // Act
+        ArrayList<taskObjectModel> result = service.fetchAllTasks(authentication);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertEquals("Tidy Room", result.get(0).getTaskName());
+        assertEquals("Grocery Shopping", result.get(1).getTaskName());
+        assertEquals("Write Report", result.get(2).getTaskName());
+
+        verify(adaptorService, times(1)).fetchAllTasksByOwner("ETHAN");
     }
 
     private static List<TaskEntity> getTaskEntities() {
@@ -393,42 +316,88 @@ class TaskManagmentServiceTest {
     @Test
     @DisplayName("Tests task is fetched correctly Based on id")
     void fetchTaskWithId() {
-        List<TaskEntity> resultList = getTaskEntities();
+        // Arrange
         TaskManagmentService service = new TaskManagmentService();
-        service.adaptorService = new AdaptorService();
-        EntityManager entityManager = spy(EntityManager.class);
-        service.adaptorService.setEntityManager(entityManager);
-        TaskMapper taskMapper = new TaskMapperImpl();
-        service.adaptorService.setTaskMapper(taskMapper);
+        AdaptorService adaptorService = mock(AdaptorService.class);
+        service.adaptorService = adaptorService;
 
-        //Act
-        when(entityManager.find(TaskEntity.class, 2L)).thenReturn(resultList.get(1));
-        taskObjectModel returnedModel = service.fetchTaskWithId(2L);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn("ETHAN");
+        when(authentication.getRoles()).thenReturn(List.of("USER"));
 
+        taskObjectModel expectedTask = new taskObjectModel(
+                2L, "ETHAN", "Grocery Shopping", "Errand", "Medium", "Buy milk, eggs, bread");
 
-        //Assert
-        Mockito.verify(entityManager).find(TaskEntity.class, 2L);
-        Assertions.assertEquals(resultList.get(1).getTaskName(), returnedModel.getTaskName());
-        Assertions.assertEquals(resultList.get(1).getTaskType(), returnedModel.getTaskType());
-        Assertions.assertEquals(resultList.get(1).getTaskLevel(), returnedModel.getTaskLevel());
-        Assertions.assertEquals(resultList.get(1).getTaskDescription(), returnedModel.getTaskDescription());
-        Assertions.assertEquals(resultList.get(1).getId(), returnedModel.getId());
+        when(adaptorService.retrieveTask(2L)).thenReturn(expectedTask);
+
+        // Act
+        taskObjectModel result = service.fetchTaskWithId(2L, authentication);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedTask.getTaskName(), result.getTaskName());
+        assertEquals(expectedTask.getTaskType(), result.getTaskType());
+        assertEquals(expectedTask.getTaskLevel(), result.getTaskLevel());
+        assertEquals(expectedTask.getTaskDescription(), result.getTaskDescription());
+        assertEquals(expectedTask.getId(), result.getId());
+
+        verify(adaptorService, times(1)).retrieveTask(2L);
     }
 
     @Test
     @DisplayName("Task throws and logs error when nothing is returned")
     void taskThrowsErrorWhenEntityManagerFailsToReturnAnything(){
-        List<TaskEntity> resultList = getTaskEntities();
+        // Arrange
         TaskManagmentService service = new TaskManagmentService();
-        service.adaptorService = new AdaptorService();
-        EntityManager entityManager = spy(EntityManager.class);
-        service.adaptorService.setEntityManager(entityManager);
-        TaskMapper taskMapper = new TaskMapperImpl();
-        service.adaptorService.setTaskMapper(taskMapper);
+        AdaptorService adaptorService = mock(AdaptorService.class);
+        service.adaptorService = adaptorService;
+
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn("ETHAN");
+        when(authentication.getRoles()).thenReturn(List.of("USER"));
+
+        when(adaptorService.retrieveTask(2L)).thenThrow(new IllegalArgumentException("Task not found"));
+
+
+        // Assert
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            service.fetchTaskWithId(2L, authentication);
+        });
+        verify(adaptorService, times(1)).retrieveTask(2L);
+    }
+
+    @Test
+    void validateTaskOwnershipAndAuthority() {
+        //method checks whether user either has authority as a suer or is the owner of the task
+        //arrange
+
+        TaskManagmentService service = new TaskManagmentService();
+        Authentication authenticationRole = mock(Authentication.class);
+        Authentication authenticationOwner = mock(Authentication.class);
+
+        taskObjectModel ethanTask = new taskObjectModel(
+                1L,                     // ID
+                "ETHAN",                // Task Owner
+                "Organize Workspace",   // Task Name
+                "Chore",                // Task Type
+                "Medium",               // Task Level
+                "Sort cables, dust off desk, and arrange items neatly" // Description
+        );
+
+        // Mock a user who owns the task
+        when(authenticationOwner.getName()).thenReturn("ETHAN");
+
+        // Mock a different user with admin privileges
+        when(authenticationRole.getName()).thenReturn("notAnOwner");
+        when(authenticationRole.getRoles()).thenReturn(List.of("ADMIN"));
 
         //Act
-        when(entityManager.find(TaskEntity.class, 2L)).thenReturn(null);
-        taskObjectModel returnedModel = service.fetchTaskWithId(2L);
-        Assertions.assertNull(returnedModel);
+        boolean resultAsTaskOwner = service.validateTaskOwnershipAndAuthority(ethanTask,authenticationOwner,List.of("USER"));
+
+        boolean resultAsAdmin = service.validateTaskOwnershipAndAuthority(ethanTask,authenticationRole,List.of("ADMIN"));
+
+        Assertions.assertTrue(resultAsTaskOwner);
+        Assertions.assertTrue(resultAsAdmin);
+
     }
 }
