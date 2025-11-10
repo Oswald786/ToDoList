@@ -367,6 +367,7 @@ class TaskManagmentServiceTest {
     }
 
     @Test
+    @DisplayName("Validate that task access is granted to owner or authorized user")
     void validateTaskOwnershipAndAuthority() {
         //method checks whether user either has authority as a suer or is the owner of the task
         //arrange

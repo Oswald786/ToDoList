@@ -1,14 +1,22 @@
 package com.todolist.auth;
 
 import com.todolist.Models.userDetailsModel;
+import com.todolist.Services.GameService;
 import com.todolist.Services.TaskManagmentService;
 import com.todolist.adaptors.persistence.jpa.userEntity;
+import io.micronaut.security.authentication.Authentication;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+@Getter
+@Setter
 @Singleton
 public class RegistrationService {
     @Inject
@@ -20,25 +28,49 @@ public class RegistrationService {
     @Inject
     AuthAdaptorService authAdaptorService;
 
+    @Inject
+    GameService gameService;
     private static final Logger log = LoggerFactory.getLogger(RegistrationService.class);
 
 
     public void register(userDetailsModel userDetailsModelProvided){
         //hash password
         String hashedPassword = passwordHasher.hashPassword(userDetailsModelProvided.getPassword());
+        if (hashedPassword == null || hashedPassword.equals(userDetailsModelProvided.getPassword())) {
+            log.error("Password could not be hashed");
+            throw new IllegalArgumentException("Password could not be hashed");
+        }
 
         //save user
         try {
             userDetailsModel userToAdd = userDetailsModelProvided;
             userToAdd.setPassword(hashedPassword);
+            System.out.println("===== USER REGISTRATION DEBUG =====");
+            System.out.println("Username: " + userToAdd.getUserName());
+            System.out.println("Email: " + userToAdd.getEMAIL());
+            System.out.println("Role (before set): " + userToAdd.getRole());
+            System.out.println("Hashed Password: " + hashedPassword);
+            System.out.println("===================================");
+            userEntity exsistingUser = null;
+
+
+
+
+            if (exsistingUser != null) {
+                log.error("User with username ${userToAdd.getUserName()} already exists");
+                throw new IllegalArgumentException("User with username " + userToAdd.getUserName() + " already exists");
+            }
+            userToAdd.setRole("USER");
+
+
             authAdaptorService.createUser(userToAdd);
+//            gameService.createPlayerStatsProfile(userToAdd);
             //confirmation
             System.out.println("User registered");
         }catch (Exception e){
-            e.printStackTrace();
+            log.warn("Error registering user");
             log.error(String.valueOf(e.getCause()));
-            throw new IllegalArgumentException("User with username " + userDetailsModelProvided.getUserName() + " already exists");
+            throw new IllegalArgumentException("Error registering user");
         }
-
     }
 }
