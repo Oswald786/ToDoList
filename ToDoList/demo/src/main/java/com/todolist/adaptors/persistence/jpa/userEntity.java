@@ -19,7 +19,8 @@ public class userEntity {
     private Long id;
 
     @Id
-    @Column(name = "USERNAME")
+    @Column(name = "USERNAME",unique = true)
+
     @Getter
     @Setter
     private String userName;

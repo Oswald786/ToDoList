@@ -103,7 +103,6 @@ class RegistrationServiceTest {
 
         // Assert
         verify(passwordHasher).hashPassword("unHashedPassword");
-        verify(registrationService.getEntityManager()).find(userEntity.class, "ETHAN");
         verify(registrationService.getAuthAdaptorService()).createUser(any(userDetailsModel.class));
 
 

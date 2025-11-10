@@ -13,5 +13,8 @@ VALUES ('Susan','Add validation', 'DB', 2, 'Constraints, unique keys, checks');
 INSERT INTO USERS (USERNAME,PASSWORD,ROLE,EMAIL)
 VALUES ('Ethan','$2a$12$aL84Fj.UCmKIa0wvVOJ4wggPGPetnQ32fkQ0t6V7KUaY5rdqd6pi.', 'ADMIN', 'ethanslade63@gmail.com');
 
+INSERT INTO PLAYER_STATS (PLAYER_USERNAME,PLAYER_LEVEL,PLAYER_XP,XP_TO_NEXT_LEVEL)
+VALUES ('Ethan',1,200,0);
+
 COMMIT;
 

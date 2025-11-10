@@ -4,7 +4,7 @@ import com.todolist.Models.userDetailsModel;
 import com.todolist.adaptors.persistence.jpa.userEntity;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "jakarta")
+@Mapper(componentModel = "jsr330")
 public interface UserMapper {
 
     userEntity toEntity(userDetailsModel userDetailsModel);

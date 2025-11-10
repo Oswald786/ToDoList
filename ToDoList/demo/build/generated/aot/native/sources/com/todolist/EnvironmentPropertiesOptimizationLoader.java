@@ -24,9 +24,7 @@ public class EnvironmentPropertiesOptimizationLoader implements StaticOptimizati
     env.put("USERNAME", Arrays.asList("username"));
     env.put("PWD", Arrays.asList("pwd"));
     env.put("ProgramFiles(x86)", Arrays.asList("programfiles(x86)"));
-    env.put("FPS_BROWSER_USER_PROFILE_STRING", Arrays.asList("fps.browser.user.profile.string", "fps.browser.user.profile-string", "fps.browser.user-profile.string", "fps.browser.user-profile-string", "fps.browser-user.profile.string", "fps.browser-user.profile-string", "fps.browser-user-profile.string", "fps.browser-user-profile-string", "fps-browser.user.profile.string", "fps-browser.user.profile-string", "fps-browser.user-profile.string", "fps-browser.user-profile-string", "fps-browser-user.profile.string", "fps-browser-user.profile-string", "fps-browser-user-profile.string", "fps-browser-user-profile-string"));
     env.put("PATHEXT", Arrays.asList("pathext"));
-    env.put("EFC_7460_2283032206", Arrays.asList("efc.7460.2283032206", "efc.7460-2283032206", "efc-7460.2283032206", "efc-7460-2283032206"));
     env.put("DriverData", Arrays.asList("driverdata"));
     env.put("OneDriveConsumer", Arrays.asList("onedriveconsumer"));
     env.put("OLDPWD", Arrays.asList("oldpwd"));
@@ -36,19 +34,15 @@ public class EnvironmentPropertiesOptimizationLoader implements StaticOptimizati
     env.put("__PSLockDownPolicy", Arrays.asList("..pslockdownpolicy", ".-pslockdownpolicy", "-.pslockdownpolicy", "--pslockdownpolicy"));
     env.put("HOMEPATH", Arrays.asList("homepath"));
     env.put("PROCESSOR_IDENTIFIER", Arrays.asList("processor.identifier", "processor-identifier"));
-    env.put("EFC_7460_1262719628", Arrays.asList("efc.7460.1262719628", "efc.7460-1262719628", "efc-7460.1262719628", "efc-7460-1262719628"));
     env.put("PUBLIC", Arrays.asList("public"));
-    env.put("EFC_7460_2775293581", Arrays.asList("efc.7460.2775293581", "efc.7460-2775293581", "efc-7460.2775293581", "efc-7460-2775293581"));
     env.put("EXEPATH", Arrays.asList("exepath"));
     env.put("=::", Arrays.asList("=::"));
     env.put("SHLVL", Arrays.asList("shlvl"));
     env.put("LOCALAPPDATA", Arrays.asList("localappdata"));
     env.put("USERDOMAIN", Arrays.asList("userdomain"));
     env.put("LOGONSERVER", Arrays.asList("logonserver"));
-    env.put("FPS_BROWSER_APP_PROFILE_STRING", Arrays.asList("fps.browser.app.profile.string", "fps.browser.app.profile-string", "fps.browser.app-profile.string", "fps.browser.app-profile-string", "fps.browser-app.profile.string", "fps.browser-app.profile-string", "fps.browser-app-profile.string", "fps.browser-app-profile-string", "fps-browser.app.profile.string", "fps-browser.app.profile-string", "fps-browser.app-profile.string", "fps-browser.app-profile-string", "fps-browser-app.profile.string", "fps-browser-app.profile-string", "fps-browser-app-profile.string", "fps-browser-app-profile-string"));
     env.put("PLINK_PROTOCOL", Arrays.asList("plink.protocol", "plink-protocol"));
     env.put("JAVA_HOME", Arrays.asList("java.home", "java-home"));
-    env.put("EFC_7460_1592913036", Arrays.asList("efc.7460.1592913036", "efc.7460-1592913036", "efc-7460.1592913036", "efc-7460-1592913036"));
     env.put("TERM", Arrays.asList("term"));
     env.put("OneDrive", Arrays.asList("onedrive"));
     env.put("MSYSTEM", Arrays.asList("msystem"));
@@ -56,6 +50,7 @@ public class EnvironmentPropertiesOptimizationLoader implements StaticOptimizati
     env.put("SYSTEMROOT", Arrays.asList("systemroot"));
     env.put("3DVPATH", Arrays.asList("3dvpath"));
     env.put("OS", Arrays.asList("os"));
+    env.put("EFC_8524_1592913036", Arrays.asList("efc.8524.1592913036", "efc.8524-1592913036", "efc-8524.1592913036", "efc-8524-1592913036"));
     env.put("COMPUTERNAME", Arrays.asList("computername"));
     env.put("COMSPEC", Arrays.asList("comspec"));
     env.put("COMMONPROGRAMFILES", Arrays.asList("commonprogramfiles"));
@@ -63,7 +58,6 @@ public class EnvironmentPropertiesOptimizationLoader implements StaticOptimizati
     env.put("CommonProgramW6432", Arrays.asList("commonprogramw6432"));
     env.put("TERMINAL_EMULATOR", Arrays.asList("terminal.emulator", "terminal-emulator"));
     env.put("TEMP", Arrays.asList("temp"));
-    env.put("EFC_7460_3789132940", Arrays.asList("efc.7460.3789132940", "efc.7460-3789132940", "efc-7460.3789132940", "efc-7460-3789132940"));
     env.put("USERPROFILE", Arrays.asList("userprofile"));
     env.put("HOMEDRIVE", Arrays.asList("homedrive"));
     env.put("TMP", Arrays.asList("tmp"));
