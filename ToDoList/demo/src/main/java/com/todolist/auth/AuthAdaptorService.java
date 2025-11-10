@@ -1,7 +1,7 @@
 package com.todolist.auth;
 
-import com.todolist.Models.userDetailsModel;
-import com.todolist.adaptors.persistence.jpa.userEntity;
+import com.todolist.Models.UserDetailsModel;
+import com.todolist.adaptors.persistence.Jpa.UserEntity;
 import com.todolist.adaptors.web.UserMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -24,9 +24,9 @@ public class AuthAdaptorService {
 
     //find user
     @Transactional
-    public userDetailsModel findUser(String username){
+    public UserDetailsModel findUser(String username){
         try {
-            userEntity entityReturned = entityManager.createQuery("SELECT u FROM userEntity u WHERE u.userName = :username", userEntity.class)
+            UserEntity entityReturned = entityManager.createQuery("SELECT u FROM UserEntity u WHERE u.userName = :username", UserEntity.class)
                     .setParameter("username", username)
                     .getSingleResult();
             System.out.println("Found user");
@@ -43,7 +43,7 @@ public class AuthAdaptorService {
     @Transactional
     public void deleteUser(String username){
         try {
-            entityManager.remove(entityManager.find(userDetailsModel.class, username));
+            entityManager.remove(entityManager.find(UserDetailsModel.class, username));
         }catch (Exception e){
             log.error(String.valueOf(e.getCause()));
         }
@@ -52,9 +52,9 @@ public class AuthAdaptorService {
 
     //update user
     @Transactional
-    public void updateUser(userDetailsModel userDetailsModel){
+    public void updateUser(UserDetailsModel userDetailsModel){
         try {
-            userEntity entity = userMapper.toEntity(userDetailsModel);
+            UserEntity entity = userMapper.toEntity(userDetailsModel);
             entityManager.merge(entity);
         }catch (Exception e){
             log.error(String.valueOf(e.getCause()));
@@ -64,9 +64,9 @@ public class AuthAdaptorService {
 
     //create user
     @Transactional
-    public void createUser(userDetailsModel userDetailsModel){
+    public void createUser(UserDetailsModel userDetailsModel){
         try {
-            userEntity entity = userMapper.toEntity(userDetailsModel);
+            UserEntity entity = userMapper.toEntity(userDetailsModel);
             entityManager.persist(entity);
         }catch (Exception e){
             log.error(String.valueOf(e.getCause()));

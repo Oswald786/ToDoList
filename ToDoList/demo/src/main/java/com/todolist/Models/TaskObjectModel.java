@@ -1,15 +1,13 @@
 package com.todolist.Models;
 
 import io.micronaut.serde.annotation.Serdeable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
 @Serdeable
 @Getter
 @Setter
-public class taskObjectModel {
+public class TaskObjectModel {
         private Long id;
 
 
@@ -27,7 +25,7 @@ public class taskObjectModel {
 
         private String taskDescription;
 
-    public taskObjectModel(Long id,String taskOwner, String taskName, String taskType, String taskLevel, String taskDescription) {
+    public TaskObjectModel(Long id, String taskOwner, String taskName, String taskType, String taskLevel, String taskDescription) {
         this.id = id;
         this.taskOwnerId = taskOwner;
         this.taskName = taskName;
@@ -36,6 +34,6 @@ public class taskObjectModel {
         this.taskDescription = taskDescription;
     }
 
-    public taskObjectModel() {
+    public TaskObjectModel() {
     }
 }

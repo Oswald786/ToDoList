@@ -1,7 +1,7 @@
 package com.todolist.Services;
 
-import com.todolist.Models.taskObjectModel;
-import com.todolist.Models.updateTaskRequestPackage;
+import com.todolist.Models.TaskObjectModel;
+import com.todolist.Models.UpdateTaskRequestPackage;
 import com.todolist.adaptors.web.AdaptorService;
 import io.micronaut.security.authentication.Authentication;
 import jakarta.inject.Inject;
@@ -28,7 +28,7 @@ public class TaskManagmentService {
     }
     //add the task owner id to all arguments
 
-    public void createTask(taskObjectModel taskObjectModel, Authentication authentication){
+    public void createTask(TaskObjectModel taskObjectModel, Authentication authentication){
         try{
             log.info("Task creation in progress");
             taskObjectModel.setTaskOwnerId(authentication.getName());
@@ -40,11 +40,11 @@ public class TaskManagmentService {
         }
     }
 
-    public void updateTask(updateTaskRequestPackage updateTaskRequestPackage,Authentication authentication){
+    public void updateTask(UpdateTaskRequestPackage updateTaskRequestPackage, Authentication authentication){
         log.info("Creating update task request");
         try {
             //need to validate here the task owner id provided matches with the task id provided
-            taskObjectModel tasktoUpdate = adaptorService.retrieveTask(updateTaskRequestPackage.getId());
+            TaskObjectModel tasktoUpdate = adaptorService.retrieveTask(updateTaskRequestPackage.getId());
             if(!validateTaskOwnershipAndAuthority(tasktoUpdate,authentication,List.of("ADMIN","USER"))){
                 log.warn("User does not have permission to update this task");
                 throw new IllegalArgumentException("User does not have permission to update this task");
@@ -62,7 +62,7 @@ public class TaskManagmentService {
         log.info("Creating delete task request");
         try {
             //need to validate here the task owner id provided matches with the task id provided
-            taskObjectModel taskToDelete = adaptorService.retrieveTask(id);
+            TaskObjectModel taskToDelete = adaptorService.retrieveTask(id);
             if(!validateTaskOwnershipAndAuthority(taskToDelete,authentication,List.of("ADMIN","USER"))){
                 log.warn("User does not have permission to delete this task");
                 throw new IllegalArgumentException("User does not have permission to delete this task");
@@ -76,7 +76,7 @@ public class TaskManagmentService {
         }
 
     }
-    public ArrayList<taskObjectModel> fetchAllTasks(Authentication authentication){
+    public ArrayList<TaskObjectModel> fetchAllTasks(Authentication authentication){
         log.info("Fetching all tasks");
         try {
             //need to validate here the task owner id provided matches with all the task id's provided
@@ -88,9 +88,9 @@ public class TaskManagmentService {
         }
 
     }
-    public taskObjectModel fetchTaskWithId(long id,Authentication authentication){
+    public TaskObjectModel fetchTaskWithId(long id, Authentication authentication){
         log.info("Fetching task with id");
-        taskObjectModel retrievedEntity = adaptorService.retrieveTask(id);
+        TaskObjectModel retrievedEntity = adaptorService.retrieveTask(id);
         try {
             //need to validate here the task owner id provided matches with the task id provided
             if(!validateTaskOwnershipAndAuthority(retrievedEntity,authentication,List.of("ADMIN","USER"))){
@@ -107,7 +107,7 @@ public class TaskManagmentService {
         }
     }
 
-    public boolean validateTaskObjectModel(taskObjectModel taskObjectModel,Authentication authentication){
+    public boolean validateTaskObjectModel(TaskObjectModel taskObjectModel, Authentication authentication){
         ArrayList<String> errors = new ArrayList<>();
         if(taskObjectModel.getTaskName() == null || taskObjectModel.getTaskName().isEmpty()){
             errors.add("Task name cannot be empty");
@@ -129,7 +129,7 @@ public class TaskManagmentService {
         }
     }
 
-    public boolean validateTaskOwnershipAndAuthority(taskObjectModel task,
+    public boolean validateTaskOwnershipAndAuthority(TaskObjectModel task,
                                                      Authentication authentication,
                                                      List<String> allowedRoles) {
         System.out.println("Validating task ownership and authority");

@@ -1,6 +1,5 @@
-package com.todolist.adaptors.persistence.jpa;
+package com.todolist.adaptors.persistence.Jpa;
 
-import io.micronaut.http.annotation.Get;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +9,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name="USERS")
-public class userEntity {
+public class UserEntity {
 
     //need to work on getitng the id randomly hen creating objects
     @Column(name = "USER_ID")
@@ -19,6 +18,7 @@ public class userEntity {
     private Long id;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "USERNAME",unique = true)
 
     @Getter

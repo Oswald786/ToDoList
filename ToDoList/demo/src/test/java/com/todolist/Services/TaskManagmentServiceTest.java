@@ -1,22 +1,14 @@
 package com.todolist.Services;
 
-import com.todolist.Models.taskObjectModel;
-import com.todolist.Models.updateTaskRequestPackage;
-import com.todolist.adaptors.persistence.jpa.TaskEntity;
+import com.todolist.Models.TaskObjectModel;
+import com.todolist.Models.UpdateTaskRequestPackage;
+import com.todolist.adaptors.persistence.Jpa.TaskEntity;
 import com.todolist.adaptors.web.AdaptorService;
-import com.todolist.adaptors.web.TaskMapper;
-import com.todolist.adaptors.web.TaskMapperImpl;
-import com.todolist.auth.AuthenticationService;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.*;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,21 +20,21 @@ import static org.mockito.Mockito.*;
 @DisplayName("TaskManagmentService Authentication Tests")
 class TaskManagmentServiceTest {
 
-    taskObjectModel valid;
+    TaskObjectModel valid;
 
-    taskObjectModel invalidNameNull;
-    taskObjectModel invalidNameEmpty;
+    TaskObjectModel invalidNameNull;
+    TaskObjectModel invalidNameEmpty;
 
-    taskObjectModel invalidTypeNull;
-    taskObjectModel invalidTypeEmpty;
+    TaskObjectModel invalidTypeNull;
+    TaskObjectModel invalidTypeEmpty;
 
-    taskObjectModel invalidLevelNull;
-    taskObjectModel invalidLevelEmpty;
+    TaskObjectModel invalidLevelNull;
+    TaskObjectModel invalidLevelEmpty;
 
-    taskObjectModel invalidDescNull;
-    taskObjectModel invalidDescEmpty;
+    TaskObjectModel invalidDescNull;
+    TaskObjectModel invalidDescEmpty;
 
-    java.util.List<taskObjectModel> allInvalid;
+    java.util.List<TaskObjectModel> allInvalid;
 
     Authentication mockAuthentication;
 
@@ -50,23 +42,23 @@ class TaskManagmentServiceTest {
     @BeforeEach
     void setUp() {
         // Valid baseline
-        valid = new taskObjectModel(1L,"ETHAN", "Test Task", "Test Type", "Test Level", "Test Description");
+        valid = new TaskObjectModel(1L,"ETHAN", "Test Task", "Test Type", "Test Level", "Test Description");
 
         // Invalid: task name
-        invalidNameNull  = new taskObjectModel(2L,"ETHAN", null,        "Test Type", "Test Level", "Test Description");
-        invalidNameEmpty = new taskObjectModel(3L,"ETHAN", "",          "Test Type", "Test Level", "Test Description");
+        invalidNameNull  = new TaskObjectModel(2L,"ETHAN", null,        "Test Type", "Test Level", "Test Description");
+        invalidNameEmpty = new TaskObjectModel(3L,"ETHAN", "",          "Test Type", "Test Level", "Test Description");
 
         // Invalid: task type
-        invalidTypeNull  = new taskObjectModel(4L,"ETHAN", "Test Task", null,        "Test Level", "Test Description");
-        invalidTypeEmpty = new taskObjectModel(5L,"ETHAN", "Test Task", "",          "Test Level", "Test Description");
+        invalidTypeNull  = new TaskObjectModel(4L,"ETHAN", "Test Task", null,        "Test Level", "Test Description");
+        invalidTypeEmpty = new TaskObjectModel(5L,"ETHAN", "Test Task", "",          "Test Level", "Test Description");
 
         // Invalid: task level
-        invalidLevelNull  = new taskObjectModel(6L,"ETHAN", "Test Task", "Test Type", null,        "Test Description");
-        invalidLevelEmpty = new taskObjectModel(7L,"ETHAN", "Test Task", "Test Type", "",          "Test Description");
+        invalidLevelNull  = new TaskObjectModel(6L,"ETHAN", "Test Task", "Test Type", null,        "Test Description");
+        invalidLevelEmpty = new TaskObjectModel(7L,"ETHAN", "Test Task", "Test Type", "",          "Test Description");
 
         // Invalid: task description
-        invalidDescNull  = new taskObjectModel(8L,"ETHAN", "Test Task", "Test Type", "Test Level", null);
-        invalidDescEmpty = new taskObjectModel(9L,"ETHAN", "Test Task", "Test Type", "Test Level", "");
+        invalidDescNull  = new TaskObjectModel(8L,"ETHAN", "Test Task", "Test Type", "Test Level", null);
+        invalidDescEmpty = new TaskObjectModel(9L,"ETHAN", "Test Task", "Test Type", "Test Level", "");
 
         // Convenience collection
         allInvalid = java.util.List.of(
@@ -85,7 +77,7 @@ class TaskManagmentServiceTest {
     void createTask() {
         //Arrange
         TaskManagmentService service = mock(TaskManagmentService.class);
-        taskObjectModel taskObjectModel = new taskObjectModel();
+        TaskObjectModel taskObjectModel = new TaskObjectModel();
         taskObjectModel.setTaskName("Test Task");
         taskObjectModel.setTaskType("Test Type");
         taskObjectModel.setTaskDescription("Test Description");
@@ -103,7 +95,7 @@ class TaskManagmentServiceTest {
     void createTask_ValidatesTaskCorrectly() {
         //Arrange
         TaskManagmentService service = spy(new TaskManagmentService());
-        taskObjectModel CorrecttaskObjectModel = new taskObjectModel();
+        TaskObjectModel CorrecttaskObjectModel = new TaskObjectModel();
         CorrecttaskObjectModel.setTaskName("Test Task");
         CorrecttaskObjectModel.setTaskType("Test Type");
         CorrecttaskObjectModel.setTaskDescription("Test Description");
@@ -144,7 +136,7 @@ class TaskManagmentServiceTest {
         service.adaptorService = new AdaptorService();
         EntityManager entityManager = mock(EntityManager.class);
         service.adaptorService.setEntityManager(entityManager);
-        updateTaskRequestPackage updateTaskRequestPackage = mock(updateTaskRequestPackage.class);
+        UpdateTaskRequestPackage updateTaskRequestPackage = mock(UpdateTaskRequestPackage.class);
 
 
         when(entityManager.find(eq(TaskEntity.class), anyLong())).thenReturn(null);
@@ -164,7 +156,7 @@ class TaskManagmentServiceTest {
         service.adaptorService = new AdaptorService();
         EntityManager entityManager = mock(EntityManager.class);
         service.adaptorService.setEntityManager(entityManager);
-        updateTaskRequestPackage req = new updateTaskRequestPackage(1L, "taskName", null);
+        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "taskName", null);
         TaskEntity taskEntity = mock(TaskEntity.class);
 
 
@@ -185,7 +177,7 @@ class TaskManagmentServiceTest {
         service.adaptorService = new AdaptorService();
         EntityManager entityManager = mock(EntityManager.class);
         service.adaptorService.setEntityManager(entityManager);
-        updateTaskRequestPackage req = new updateTaskRequestPackage(1L, null, "Task Type");
+        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, null, "Task Type");
         TaskEntity taskEntity = mock(TaskEntity.class);
 
 
@@ -207,9 +199,9 @@ class TaskManagmentServiceTest {
         AdaptorService adaptorService = mock(AdaptorService.class);
         service.adaptorService = adaptorService;
 
-        updateTaskRequestPackage req = new updateTaskRequestPackage(1, "Tidy Room", "taskName");
+        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1, "Tidy Room", "taskName");
 
-        taskObjectModel fakeTask = new taskObjectModel();
+        TaskObjectModel fakeTask = new TaskObjectModel();
         fakeTask.setId(1L);
         fakeTask.setTaskOwnerId("ETHAN");
         fakeTask.setTaskName("Old Task");
@@ -235,7 +227,7 @@ class TaskManagmentServiceTest {
         service.adaptorService = adaptorService;
 
         long taskId = 1L;
-        taskObjectModel fakeTask = new taskObjectModel();
+        TaskObjectModel fakeTask = new TaskObjectModel();
         fakeTask.setId(taskId);
         fakeTask.setTaskOwnerId("ETHAN");
 
@@ -261,15 +253,15 @@ class TaskManagmentServiceTest {
         Authentication authentication = mock(Authentication.class);
         when(authentication.getName()).thenReturn("ETHAN");
 
-        ArrayList<taskObjectModel> expectedList = new ArrayList<>();
-        expectedList.add(new taskObjectModel(1L, "ETHAN", "Tidy Room", "Chore", "Easy", "Pick up clothes and make the bed"));
-        expectedList.add(new taskObjectModel(2L, "ETHAN", "Grocery Shopping", "Errand", "Medium", "Buy milk, eggs, bread"));
-        expectedList.add(new taskObjectModel(3L, "ETHAN", "Write Report", "Work", "Hard", "Summarize Q3 project outcomes"));
+        ArrayList<TaskObjectModel> expectedList = new ArrayList<>();
+        expectedList.add(new TaskObjectModel(1L, "ETHAN", "Tidy Room", "Chore", "Easy", "Pick up clothes and make the bed"));
+        expectedList.add(new TaskObjectModel(2L, "ETHAN", "Grocery Shopping", "Errand", "Medium", "Buy milk, eggs, bread"));
+        expectedList.add(new TaskObjectModel(3L, "ETHAN", "Write Report", "Work", "Hard", "Summarize Q3 project outcomes"));
 
         when(adaptorService.fetchAllTasksByOwner("ETHAN")).thenReturn(expectedList);
 
         // Act
-        ArrayList<taskObjectModel> result = service.fetchAllTasks(authentication);
+        ArrayList<TaskObjectModel> result = service.fetchAllTasks(authentication);
 
         // Assert
         assertNotNull(result);
@@ -325,13 +317,13 @@ class TaskManagmentServiceTest {
         when(authentication.getName()).thenReturn("ETHAN");
         when(authentication.getRoles()).thenReturn(List.of("USER"));
 
-        taskObjectModel expectedTask = new taskObjectModel(
+        TaskObjectModel expectedTask = new TaskObjectModel(
                 2L, "ETHAN", "Grocery Shopping", "Errand", "Medium", "Buy milk, eggs, bread");
 
         when(adaptorService.retrieveTask(2L)).thenReturn(expectedTask);
 
         // Act
-        taskObjectModel result = service.fetchTaskWithId(2L, authentication);
+        TaskObjectModel result = service.fetchTaskWithId(2L, authentication);
 
         // Assert
         assertNotNull(result);
@@ -376,7 +368,7 @@ class TaskManagmentServiceTest {
         Authentication authenticationRole = mock(Authentication.class);
         Authentication authenticationOwner = mock(Authentication.class);
 
-        taskObjectModel ethanTask = new taskObjectModel(
+        TaskObjectModel ethanTask = new TaskObjectModel(
                 1L,                     // ID
                 "ETHAN",                // Task Owner
                 "Organize Workspace",   // Task Name

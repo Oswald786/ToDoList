@@ -3,7 +3,7 @@ package com.todolist.Models;
 import io.micronaut.serde.annotation.Serdeable;
 
 @Serdeable
-public class updateTaskRequestPackage {
+public class UpdateTaskRequestPackage {
 
     long id;
 
@@ -11,13 +11,13 @@ public class updateTaskRequestPackage {
 
     String replacementValue;
 
-    public updateTaskRequestPackage(long id, String replacementValue, String fieldToUpdate) {
+    public UpdateTaskRequestPackage(long id, String replacementValue, String fieldToUpdate) {
         this.id = id;
         this.replacementValue = replacementValue;
         this.fieldToUpdate = fieldToUpdate;
     }
 
-    public updateTaskRequestPackage() {
+    public UpdateTaskRequestPackage() {
     }
 
     public String getFieldToUpdate() {

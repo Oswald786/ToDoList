@@ -1,10 +1,9 @@
 package com.todolist.auth;
 
-import com.todolist.Models.userDetailsModel;
-import com.todolist.adaptors.persistence.jpa.userEntity;
+import com.todolist.Models.UserDetailsModel;
+import com.todolist.adaptors.persistence.Jpa.UserEntity;
 import com.todolist.adaptors.web.UserMapper;
 import com.todolist.adaptors.web.UserMapperImpl;
-import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +34,7 @@ class RegistrationServiceTest {
     @DisplayName("User unable to register because there password has not been hashed")
     void registerFailsWithUnhashedPassword() {
         // Arrange
-        userDetailsModel userDetailsModel = new userDetailsModel();
+        UserDetailsModel userDetailsModel = new UserDetailsModel();
         userDetailsModel.setUserName("ETHAN");
         userDetailsModel.setPassword("unhashed");
         when(passwordHasher.hashPassword(eq("unhashed"))).thenReturn("unhashed");
@@ -52,13 +51,13 @@ class RegistrationServiceTest {
     @DisplayName("User unable to register because the user already exists")
     void registerFailsWithExistingUser() {
         // Arrange
-        userDetailsModel userDetailsModel = new userDetailsModel();
+        UserDetailsModel userDetailsModel = new UserDetailsModel();
         userDetailsModel.setUserName("ETHAN");
         userDetailsModel.setPassword("hashed");
         userDetailsModel.setRole("ROLE_USER");
-        userEntity userEntity = userMapper.toEntity(userDetailsModel);
+        UserEntity userEntity = userMapper.toEntity(userDetailsModel);
         when(passwordHasher.hashPassword(eq("unhashed"))).thenCallRealMethod();
-        when(registrationService.entityManager.find(eq(userEntity.class), eq(userDetailsModel.getUserName()))).thenReturn(userEntity);
+        when(registrationService.entityManager.find(eq(UserEntity.class), eq(userDetailsModel.getUserName()))).thenReturn(userEntity);
 
         //act
         assertThrows(IllegalArgumentException.class,() -> {
@@ -72,13 +71,13 @@ class RegistrationServiceTest {
     @DisplayName("User unable to register because of unknown error")
     void registerFailsWithUnknownError() {
         // Arrange
-        userDetailsModel userDetailsModel = new userDetailsModel();
+        UserDetailsModel userDetailsModel = new UserDetailsModel();
         userDetailsModel.setUserName("ETHAN");
         userDetailsModel.setPassword("hashed");
         userDetailsModel.setRole("ROLE_USER");
-        userEntity userEntity = userMapper.toEntity(userDetailsModel);
+        UserEntity userEntity = userMapper.toEntity(userDetailsModel);
         when(passwordHasher.hashPassword(eq("unhashed"))).thenCallRealMethod();
-        when(registrationService.entityManager.find(eq(userEntity.class), eq(userDetailsModel.getUserName()))).thenReturn(null);
+        when(registrationService.entityManager.find(eq(UserEntity.class), eq(userDetailsModel.getUserName()))).thenReturn(null);
 
         //act
         assertThrows(IllegalArgumentException.class,() -> {
@@ -90,20 +89,20 @@ class RegistrationServiceTest {
     @DisplayName("User able to register")
     void registerSucceeds() {
         // Arrange
-        userDetailsModel userDetailsModel = new userDetailsModel();
+        UserDetailsModel userDetailsModel = new UserDetailsModel();
         userDetailsModel.setUserName("ETHAN");
         userDetailsModel.setPassword("unHashedPassword");
         userDetailsModel.setRole("ROLE_USER");
-        userEntity userEntity = userMapper.toEntity(userDetailsModel);
+        UserEntity userEntity = userMapper.toEntity(userDetailsModel);
         when(passwordHasher.hashPassword(anyString())).thenReturn("hashedPassword");
-        when(registrationService.entityManager.find(eq(userEntity.class), eq(userDetailsModel.getUserName()))).thenReturn(null);
+        when(registrationService.entityManager.find(eq(UserEntity.class), eq(userDetailsModel.getUserName()))).thenReturn(null);
 
         //act
         registrationService.register(userDetailsModel);
 
         // Assert
         verify(passwordHasher).hashPassword("unHashedPassword");
-        verify(registrationService.getAuthAdaptorService()).createUser(any(userDetailsModel.class));
+        verify(registrationService.getAuthAdaptorService()).createUser(any(UserDetailsModel.class));
 
 
     }

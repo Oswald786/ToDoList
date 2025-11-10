@@ -1,9 +1,9 @@
 package com.todolist.Services;
 
 import com.todolist.Models.PlayerStatsModel;
-import com.todolist.Models.taskObjectModel;
-import com.todolist.Models.userDetailsModel;
-import com.todolist.adaptors.persistence.jpa.PlayerStatsEntity;
+import com.todolist.Models.TaskObjectModel;
+import com.todolist.Models.UserDetailsModel;
+import com.todolist.adaptors.persistence.Jpa.PlayerStatsEntity;
 import com.todolist.adaptors.web.AdaptorServicePlayerStats;
 import com.todolist.adaptors.web.PlayerStatsMapper;
 import io.micronaut.security.authentication.Authentication;
@@ -26,7 +26,7 @@ public class GameService {
     }
 
     //add a new player stats profile if not exists
-    public void createPlayerStatsProfile(userDetailsModel userDetailsModel) {
+    public void createPlayerStatsProfile(UserDetailsModel userDetailsModel) {
         try {
             PlayerStatsModel playerStatsModel = new PlayerStatsModel();
             playerStatsModel.setPlayerUsername(userDetailsModel.getUserName());
@@ -42,7 +42,7 @@ public class GameService {
 
 
     //Calculate XP Reward for task completion
-    public int calculateXP(taskObjectModel taskObjectModel, Authentication authentication){
+    public int calculateXP(TaskObjectModel taskObjectModel, Authentication authentication){
         int baseXp = Integer.parseInt(taskObjectModel.getTaskLevel()) * 20;
 
         PlayerStatsEntity User = adaptorServicePlayerStats.retrievePlayerStats(authentication);
@@ -57,7 +57,7 @@ public class GameService {
 
 
     //Add XP to the user profile
-    public void addXPForTaskCompletion(taskObjectModel taskObjectModel, Authentication authentication){
+    public void addXPForTaskCompletion(TaskObjectModel taskObjectModel, Authentication authentication){
         int xp = calculateXP(taskObjectModel, authentication);
         PlayerStatsModel playerStatsModel = playerStatsMapper.toModel(adaptorServicePlayerStats.retrievePlayerStats(authentication));
         playerStatsModel.setPlayerXp(playerStatsModel.getPlayerXp() + xp);

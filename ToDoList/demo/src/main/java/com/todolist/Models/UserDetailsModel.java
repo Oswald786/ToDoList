@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Serdeable
-public class userDetailsModel {
+public class UserDetailsModel {
     long id;
 
     String userName;
@@ -23,14 +23,14 @@ public class userDetailsModel {
 
 
 
-    public userDetailsModel(String userName, String password, String role, String EMAIL) {
+    public UserDetailsModel(String userName, String password, String role, String EMAIL) {
         this.userName = userName;
         this.password = password;
         this.role = role;
         this.EMAIL = EMAIL;
     }
 
-    public userDetailsModel() {
+    public UserDetailsModel() {
     }
 
 }

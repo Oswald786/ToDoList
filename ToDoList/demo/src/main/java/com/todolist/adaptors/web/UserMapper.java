@@ -1,13 +1,13 @@
 package com.todolist.adaptors.web;
 
-import com.todolist.Models.userDetailsModel;
-import com.todolist.adaptors.persistence.jpa.userEntity;
+import com.todolist.Models.UserDetailsModel;
+import com.todolist.adaptors.persistence.Jpa.UserEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "jsr330")
 public interface UserMapper {
 
-    userEntity toEntity(userDetailsModel userDetailsModel);
+    UserEntity toEntity(UserDetailsModel userDetailsModel);
 
-    userDetailsModel toModel(userEntity userEntity);
+    UserDetailsModel toModel(UserEntity userEntity);
 }

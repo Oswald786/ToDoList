@@ -1,9 +1,9 @@
 package com.todolist.adaptors.web;
 
 
-import com.todolist.Models.taskObjectModel;
-import com.todolist.Models.updateTaskRequestPackage;
-import com.todolist.adaptors.persistence.jpa.TaskEntity;
+import com.todolist.Models.TaskObjectModel;
+import com.todolist.Models.UpdateTaskRequestPackage;
+import com.todolist.adaptors.persistence.Jpa.TaskEntity;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
@@ -37,7 +37,7 @@ public class AdaptorService {
 
     //Create
     @Transactional
-    public void createTask(taskObjectModel taskObjectModel){
+    public void createTask(TaskObjectModel taskObjectModel){
         entityManager.persist(taskMapper.toEntity(taskObjectModel));
         System.out.println("Task created");
     }
@@ -45,8 +45,8 @@ public class AdaptorService {
 
     //Read
     @Transactional
-    public ArrayList<taskObjectModel> fetchAllTaskModels(){
-        ArrayList<taskObjectModel> taskObjectModels = new ArrayList<>();
+    public ArrayList<TaskObjectModel> fetchAllTaskModels(){
+        ArrayList<TaskObjectModel> taskObjectModels = new ArrayList<>();
 
         //need to add a parameter for the task owner id here to ensure that only tasks owned by the owner are returned
         //also add some error handling and soem catches for if this is not the case
@@ -59,8 +59,8 @@ public class AdaptorService {
     }
 
     @Transactional
-    public ArrayList<taskObjectModel> fetchAllTasksByOwner(String taskOwnerId){
-        ArrayList<taskObjectModel> taskObjectModelsOwned = new ArrayList<>();
+    public ArrayList<TaskObjectModel> fetchAllTasksByOwner(String taskOwnerId){
+        ArrayList<TaskObjectModel> taskObjectModelsOwned = new ArrayList<>();
 
         //need to add a parameter for the task owner id here to ensure that only tasks owned by the owner are returned
         //also add some error handling and soem catches for if this is not the case
@@ -74,7 +74,7 @@ public class AdaptorService {
     }
 
     @Transactional
-    public taskObjectModel retrieveTask(Long id){
+    public TaskObjectModel retrieveTask(Long id){
         //need to add a parameter for the task owner id here to ensure that only tasks owned by the owner are returned
         //also add some error handling and some catches for if this is not the case
             TaskEntity entity = entityManager.find(TaskEntity.class, id);
@@ -91,7 +91,7 @@ public class AdaptorService {
 
     //Update
     @Transactional
-    public void updateTask(updateTaskRequestPackage updateTaskRequestPackage) {
+    public void updateTask(UpdateTaskRequestPackage updateTaskRequestPackage) {
         TaskEntity entity = entityManager.find(TaskEntity.class, updateTaskRequestPackage.getId());
         if (entity == null) {
             throw new IllegalArgumentException("Task with id " + updateTaskRequestPackage.getId() + " does not exist");

@@ -1,14 +1,13 @@
 package com.todolist.adaptors.web;
 
-import com.todolist.Models.taskObjectModel;
-import com.todolist.Models.updateTaskRequestPackage;
-import com.todolist.adaptors.persistence.jpa.TaskEntity;
+import com.todolist.Models.TaskObjectModel;
+import com.todolist.Models.UpdateTaskRequestPackage;
+import com.todolist.adaptors.persistence.Jpa.TaskEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ class AdaptorServiceTest {
         TaskMapper fakeMapper =  mock(TaskMapper.class);
         adaptorService.setEntityManager(fakeEM);
         adaptorService.setTaskMapper(fakeMapper);
-        taskObjectModel model = new taskObjectModel(
+        TaskObjectModel model = new TaskObjectModel(
                 1L,
                 "ETHAN",
                 "Clean Desk",
@@ -55,7 +54,7 @@ class AdaptorServiceTest {
 
     @Test
     void fetchAllTaskModels() {
-        //creat empty list --> retrieve tasks using the query --> map to taskObjectModel --> add to list --> return list
+        //creat empty list --> retrieve tasks using the query --> map to TaskObjectModel --> add to list --> return list
 
         //arrange
         AdaptorService adaptorService = new AdaptorService();
@@ -83,19 +82,19 @@ class AdaptorServiceTest {
         when(query.getResultList()).thenReturn(taskEntities);
 
         //Mocking returned objects
-        when(adaptorService.taskMapper.toModel(task1)).thenReturn(new taskObjectModel(1L, "ETHAN", "Organize Workspace",
+        when(adaptorService.taskMapper.toModel(task1)).thenReturn(new TaskObjectModel(1L, "ETHAN", "Organize Workspace",
                 "Chore", "Medium", "Sort cables, clean monitor, and clear desk clutter."));
-        when(adaptorService.taskMapper.toModel(task2)).thenReturn(new taskObjectModel(2L, "ETHAN", "Write Project Summary",
+        when(adaptorService.taskMapper.toModel(task2)).thenReturn(new TaskObjectModel(2L, "ETHAN", "Write Project Summary",
                 "Work", "Hard", "Summarize weekly progress and next sprint objectives."));
         //act
-        ArrayList<taskObjectModel> returnedObjects = adaptorService.fetchAllTaskModels();
+        ArrayList<TaskObjectModel> returnedObjects = adaptorService.fetchAllTaskModels();
 
         //assert
         verify(adaptorService.taskMapper, times(2)).toModel(any(TaskEntity.class));
         verify(query, times(1)).getResultList();
         Assertions.assertEquals(2, adaptorService.fetchAllTaskModels().size());
-        taskObjectModel first = returnedObjects.get(0);
-        taskObjectModel second = returnedObjects.get(1);
+        TaskObjectModel first = returnedObjects.get(0);
+        TaskObjectModel second = returnedObjects.get(1);
 
         Assertions.assertEquals(1L, first.getId());
         Assertions.assertEquals("ETHAN", first.getTaskOwnerId());
@@ -127,10 +126,10 @@ class AdaptorServiceTest {
         task1.setTaskLevel("Medium");
 
         when(adaptorService.entityManager.find(TaskEntity.class, 1L)).thenReturn(task1);
-        when(adaptorService.taskMapper.toModel(task1)).thenReturn(new taskObjectModel(1L, "ETHAN", "Organize Workspace","Chore", "Medium", "Sort cables, clean monitor, and clear desk clutter."));
+        when(adaptorService.taskMapper.toModel(task1)).thenReturn(new TaskObjectModel(1L, "ETHAN", "Organize Workspace","Chore", "Medium", "Sort cables, clean monitor, and clear desk clutter."));
 
         //Act
-        taskObjectModel result = adaptorService.retrieveTask(1L);
+        TaskObjectModel result = adaptorService.retrieveTask(1L);
 
         //Assert
         assertNotNull(result);
@@ -142,7 +141,7 @@ class AdaptorServiceTest {
         assertEquals("Chore", result.getTaskType());
         assertEquals("Medium", result.getTaskLevel());
         assertEquals("Sort cables, clean monitor, and clear desk clutter.", result.getTaskDescription());
-        Assertions.assertInstanceOf(taskObjectModel.class, result);
+        Assertions.assertInstanceOf(TaskObjectModel.class, result);
     }
 
     @Test
@@ -172,7 +171,7 @@ class AdaptorServiceTest {
         entity.setId(1L);
         entity.setTaskName("Old Task");
 
-        updateTaskRequestPackage req = new updateTaskRequestPackage(1L, "New Task", "taskName");
+        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "New Task", "taskName");
         when(adaptorService.entityManager.find(TaskEntity.class, 1L)).thenReturn(entity);
 
         adaptorService.updateTask(req);
@@ -191,7 +190,7 @@ class AdaptorServiceTest {
         entity.setId(1L);
         when(adaptorService.entityManager.find(TaskEntity.class, 1L)).thenReturn(entity);
 
-        updateTaskRequestPackage req = new updateTaskRequestPackage(1L, "Value", "");
+        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "Value", "");
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> adaptorService.updateTask(req));
@@ -209,7 +208,7 @@ class AdaptorServiceTest {
         entity.setId(1L);
         when(adaptorService.entityManager.find(TaskEntity.class, 1L)).thenReturn(entity);
 
-        updateTaskRequestPackage req = new updateTaskRequestPackage(1L, "", "taskName");
+        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "", "taskName");
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> adaptorService.updateTask(req));
@@ -227,7 +226,7 @@ class AdaptorServiceTest {
         entity.setId(1L);
         when(adaptorService.entityManager.find(TaskEntity.class, 1L)).thenReturn(entity);
 
-        updateTaskRequestPackage req = new updateTaskRequestPackage(1L, "Value", "invalidField");
+        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "Value", "invalidField");
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> adaptorService.updateTask(req));

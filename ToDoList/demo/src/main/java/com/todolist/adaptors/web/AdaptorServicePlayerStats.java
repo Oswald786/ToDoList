@@ -1,9 +1,7 @@
 package com.todolist.adaptors.web;
 
 import com.todolist.Models.PlayerStatsModel;
-import com.todolist.Services.TaskManagmentService;
-import com.todolist.adaptors.persistence.jpa.PlayerStatsEntity;
-import io.micronaut.security.annotation.Secured;
+import com.todolist.adaptors.persistence.Jpa.PlayerStatsEntity;
 import io.micronaut.security.authentication.Authentication;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -11,6 +9,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,11 +28,14 @@ public class AdaptorServicePlayerStats {
 
     //Basic PLayer Stats Crud Operations
     // --- CREATE ---
+    @Transactional
     public void createPlayerStats(PlayerStatsModel playerStatsModel) {
         try {
             PlayerStatsEntity entity = playerStatsMapper.toEntity(playerStatsModel);
             // link to authenticated user
             entityManager.persist(entity);
+            System.out.println("Player stats created");
+            System.out.println("Player stats created");
             log.info("Player stats created for {}",entity.getPlayerUsername());
         } catch (Exception e) {
             log.error("Error creating player stats: {}", e.getMessage());
@@ -42,6 +44,7 @@ public class AdaptorServicePlayerStats {
     }
 
     // --- READ ---
+    @Transactional
     public PlayerStatsEntity retrievePlayerStats(Authentication authentication) {
         try {
             String username = authentication.getName();
@@ -64,6 +67,7 @@ public class AdaptorServicePlayerStats {
     }
 
     // --- UPDATE ---
+    @Transactional
     public void updatePlayerStats(PlayerStatsModel playerStatsModel, Authentication authentication) {
         try {
             String username = authentication.getName();
@@ -87,6 +91,7 @@ public class AdaptorServicePlayerStats {
     }
 
     // --- DELETE ---
+    @Transactional
     public void deletePlayerStats(Authentication authentication) {
         try {
             String username = authentication.getName();

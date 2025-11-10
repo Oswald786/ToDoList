@@ -1,6 +1,6 @@
 package com.todolist.auth;
 
-import com.todolist.Models.userDetailsModel;
+import com.todolist.Models.UserDetailsModel;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpRequest;
@@ -46,7 +46,7 @@ public class AuthenticationService<B> implements HttpRequestAuthenticationProvid
 
             //Find the user based on the username provided
             System.out.println("Authenticating user");
-            userDetailsModel user = authAdaptorService.findUser(username);
+            UserDetailsModel user = authAdaptorService.findUser(username);
             System.out.println("Authenticating user");
 
             //Check if user exists

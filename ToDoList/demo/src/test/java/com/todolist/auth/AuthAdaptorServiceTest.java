@@ -1,7 +1,7 @@
 package com.todolist.auth;
 
-import com.todolist.Models.userDetailsModel;
-import com.todolist.adaptors.persistence.jpa.userEntity;
+import com.todolist.Models.UserDetailsModel;
+import com.todolist.adaptors.persistence.Jpa.UserEntity;
 import com.todolist.adaptors.web.UserMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -17,7 +17,7 @@ class AuthAdaptorServiceTest {
     private AuthAdaptorService authAdaptorService;
     private EntityManager entityManager;
     private UserMapper userMapper;
-    private TypedQuery<userEntity> typedQuery;
+    private TypedQuery<UserEntity> typedQuery;
 
     @BeforeEach
     void setUp() {
@@ -35,26 +35,26 @@ class AuthAdaptorServiceTest {
     @DisplayName("✅ findUser returns mapped user when found")
     void findUser_Success() {
         // Arrange
-        userEntity userEntity = new userEntity();
+        UserEntity userEntity = new UserEntity();
         userEntity.setUserName("ETHAN");
         userEntity.setPassword("hashedPass");
 
-        userDetailsModel expectedModel = new userDetailsModel();
+        UserDetailsModel expectedModel = new UserDetailsModel();
         expectedModel.setUserName("ETHAN");
         expectedModel.setPassword("hashedPass");
 
-        when(entityManager.createQuery(anyString(), eq(userEntity.class))).thenReturn(typedQuery);
+        when(entityManager.createQuery(anyString(), eq(UserEntity.class))).thenReturn(typedQuery);
         when(typedQuery.setParameter(eq("username"), eq("ETHAN"))).thenReturn(typedQuery);
         when(typedQuery.getSingleResult()).thenReturn(userEntity);
         when(userMapper.toModel(userEntity)).thenReturn(expectedModel);
 
         // Act
-        userDetailsModel result = authAdaptorService.findUser("ETHAN");
+        UserDetailsModel result = authAdaptorService.findUser("ETHAN");
 
         // Assert
         assertNotNull(result);
         assertEquals("ETHAN", result.getUserName());
-        verify(entityManager).createQuery(anyString(), eq(userEntity.class));
+        verify(entityManager).createQuery(anyString(), eq(UserEntity.class));
         verify(userMapper).toModel(userEntity);
     }
 
@@ -63,10 +63,10 @@ class AuthAdaptorServiceTest {
     @DisplayName("❌ findUser returns null when an exception occurs")
     void findUser_Exception_ReturnsNull() {
         // Arrange
-        when(entityManager.createQuery(anyString(), eq(userEntity.class))).thenThrow(new RuntimeException("DB failure"));
+        when(entityManager.createQuery(anyString(), eq(UserEntity.class))).thenThrow(new RuntimeException("DB failure"));
 
         // Act
-        userDetailsModel result = authAdaptorService.findUser("ETHAN");
+        UserDetailsModel result = authAdaptorService.findUser("ETHAN");
 
         // Assert
         assertNull(result);
@@ -77,10 +77,10 @@ class AuthAdaptorServiceTest {
     @DisplayName("✅ createUser persists new user entity")
     void createUser_Success() {
         // Arrange
-        userDetailsModel model = new userDetailsModel();
+        UserDetailsModel model = new UserDetailsModel();
         model.setUserName("ETHAN");
 
-        userEntity entity = new userEntity();
+        UserEntity entity = new UserEntity();
         entity.setUserName("ETHAN");
 
         when(userMapper.toEntity(model)).thenReturn(entity);
@@ -98,10 +98,10 @@ class AuthAdaptorServiceTest {
     @DisplayName("❌ createUser throws IllegalArgumentException on failure")
     void createUser_Fails_ThrowsException() {
         // Arrange
-        userDetailsModel model = new userDetailsModel();
+        UserDetailsModel model = new UserDetailsModel();
         model.setUserName("ETHAN");
 
-        userEntity entity = new userEntity();
+        UserEntity entity = new UserEntity();
         entity.setUserName("ETHAN");
 
         when(userMapper.toEntity(model)).thenReturn(entity);
@@ -121,10 +121,10 @@ class AuthAdaptorServiceTest {
     @DisplayName("✅ updateUser merges user entity correctly")
     void updateUser_Success() {
         // Arrange
-        userDetailsModel model = new userDetailsModel();
+        UserDetailsModel model = new UserDetailsModel();
         model.setUserName("ETHAN");
 
-        userEntity entity = new userEntity();
+        UserEntity entity = new UserEntity();
         entity.setUserName("ETHAN");
 
         when(userMapper.toEntity(model)).thenReturn(entity);
@@ -142,10 +142,10 @@ class AuthAdaptorServiceTest {
     @DisplayName("✅ deleteUser removes user entity successfully")
     void deleteUser_Success() {
         // Arrange
-        userDetailsModel model = new userDetailsModel();
+        UserDetailsModel model = new UserDetailsModel();
         model.setUserName("ETHAN");
 
-        when(entityManager.find(userDetailsModel.class, "ETHAN")).thenReturn(model);
+        when(entityManager.find(UserDetailsModel.class, "ETHAN")).thenReturn(model);
 
         // Act
         authAdaptorService.deleteUser("ETHAN");

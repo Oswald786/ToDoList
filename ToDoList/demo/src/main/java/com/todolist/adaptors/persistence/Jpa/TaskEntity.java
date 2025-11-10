@@ -1,4 +1,4 @@
-package com.todolist.adaptors.persistence.jpa;
+package com.todolist.adaptors.persistence.Jpa;
 
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;

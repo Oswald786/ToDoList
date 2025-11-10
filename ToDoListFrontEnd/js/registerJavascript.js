@@ -42,6 +42,7 @@ async function Register() {
                 password: password,
             })
         })
+        window.location.href = "http://localhost:63342/LoginPage.html";
         await response;
         if (response.status === 200) {
             alert("Registration Successful");
@@ -49,6 +50,7 @@ async function Register() {
             //     window.location.replace("./LoginPage.html");
             // }, 1000);
             console.log(response.status);
+            console.log(response.statusText);
         } else {
             alert("Registration Failed");
             console.log(response.status);

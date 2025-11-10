@@ -1,7 +1,7 @@
 package com.todolist.Controllers;
 
 
-import com.todolist.Models.userDetailsModel;
+import com.todolist.Models.UserDetailsModel;
 import com.todolist.auth.RegistrationService;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
@@ -23,7 +23,7 @@ public class AuthController {
 
     @Secured(SecurityRule.IS_ANONYMOUS)
     @Post("/register")
-    public void register(@Body  userDetailsModel userDetailsModel){
+    public void register(@Body UserDetailsModel userDetailsModel){
         System.out.println("Registering user");
         //checkers to ensure the user is valid
         if (userDetailsModel.getUserName() == null || userDetailsModel.getUserName().isBlank()){

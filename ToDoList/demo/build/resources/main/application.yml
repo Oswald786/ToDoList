@@ -63,7 +63,7 @@ jpa:
     # Make sure Micronaut scans the package where your JPA entities live
     entity-scan:
       packages:
-        - com.todolist.adaptors.persistence.jpa
+        - com.todolist.adaptors.persistence.Jpa
 
 # Optional: choose adapter implementation by property (if you later add an HTTP-based adapter)
 adapter:

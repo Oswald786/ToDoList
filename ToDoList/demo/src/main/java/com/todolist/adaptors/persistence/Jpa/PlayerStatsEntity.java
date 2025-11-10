@@ -1,6 +1,5 @@
-package com.todolist.adaptors.persistence.jpa;
+package com.todolist.adaptors.persistence.Jpa;
 
-import io.micronaut.http.annotation.Get;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

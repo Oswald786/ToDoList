@@ -1,9 +1,6 @@
 package com.todolist.auth;
 
-import com.nimbusds.jwt.JWTParser;
-import com.nimbusds.jwt.SignedJWT;
-import com.todolist.Models.userDetailsModel;
-import io.micronaut.core.cli.exceptions.ParseException;
+import com.todolist.Models.UserDetailsModel;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.client.HttpClient;
@@ -38,7 +35,7 @@ public class JwtAuthenticationTest {
         AuthAdaptorService authAdaptorService = mock(AuthAdaptorService.class);
         PasswordHasher hasher = new PasswordHasher();
 
-        userDetailsModel testUser = new userDetailsModel();
+        UserDetailsModel testUser = new UserDetailsModel();
         testUser.setUserName("sherlock");
         testUser.setPassword(hasher.hashPassword("password"));
         testUser.setRole("USER");
