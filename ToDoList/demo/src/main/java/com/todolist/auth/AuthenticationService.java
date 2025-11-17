@@ -1,6 +1,7 @@
 package com.todolist.auth;
 
 import com.todolist.Models.UserDetailsModel;
+import com.todolist.exceptions.UserNotFoundException;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpRequest;
@@ -10,7 +11,10 @@ import io.micronaut.security.authentication.provider.HttpRequestAuthenticationPr
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -32,47 +36,41 @@ public class AuthenticationService<B> implements HttpRequestAuthenticationProvid
     @Inject
     AuthAdaptorService authAdaptorService;
 
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
+
 
 
     @Override
     public @NonNull AuthenticationResponse authenticate(@Nullable HttpRequest<B> httpRequest, @NonNull AuthenticationRequest<String, String> authRequest) {
-        try{
-            System.out.println("Authenticating user");
-            //Get the Authentication Information
-            String username = authRequest.getIdentity();
-            System.out.println("Authenticating user");
-            String password = authRequest.getSecret();
+            log.info("Authenticating user");
+            try {
+                //Get the Authentication Information
+                String username = authRequest.getIdentity();
+                String password = authRequest.getSecret();
+                log.info("Extracted username: {} and password", username);
+                //Find the user based on the username provided
+                if (username == null || username.isBlank()) {
+                    throw new IllegalArgumentException("Username cannot be null or blank");
+                } else if (password == null || password.isBlank()) {
+                    throw new IllegalArgumentException("Password cannot be null or blank");
+                }
+                UserDetailsModel user = authAdaptorService.findUser(username);
+                log.info("Found user with username: {}", username);
 
-
-            //Find the user based on the username provided
-            System.out.println("Authenticating user");
-            UserDetailsModel user = authAdaptorService.findUser(username);
-            System.out.println("Authenticating user");
-
-            //Check if user exists
-            if(user == null){
-                System.out.println("Authenticating user is null");
+                //Check the password provided matches the hashed password stored in the database
+                if (passwordHasher.checkPassword(password, user.getPassword())) {
+                    //If the password matches, then return a success response
+                    log.info("Authenticating user success");
+                    return AuthenticationResponse.success(username, List.of(user.getRole()));
+                } else {
+                    //If the password does not match, then return a failure response
+                    log.error("Authenticating user failure");
+                    return AuthenticationResponse.failure();
+                }
+            }catch (UserNotFoundException e){
+                log.error("User not found");
                 return AuthenticationResponse.failure();
             }
-
-            //Check the password provided matches the hashed password stored in the database
-            if(passwordHasher.checkPassword(password, user.getPassword())){
-                //If the password matches then return a success response
-                System.out.println("Authenticating user success");
-                return AuthenticationResponse.success(username, List.of(user.getRole()));
-            }else{
-                //If the password does not match then return a failure response
-                System.out.println("Authenticating user failure");
-                System.out.println("passeword given: " + password);
-                System.out.println("password stored: " + user.getPassword());
-                return AuthenticationResponse.failure();
-            }
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            System.out.println("Authenticating user failure catch block");
-            return AuthenticationResponse.failure();
-        }
     }
 }
 

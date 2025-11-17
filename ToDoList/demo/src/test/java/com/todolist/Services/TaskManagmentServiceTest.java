@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 @MicronautTest
-@DisplayName("TaskManagmentService Authentication Tests")
+@DisplayName("TaskManagementService Authentication Tests")
 class TaskManagmentServiceTest {
 
     TaskObjectModel valid;
@@ -76,7 +76,7 @@ class TaskManagmentServiceTest {
     @DisplayName("Test createTask interacts with entity manager as expected")
     void createTask() {
         //Arrange
-        TaskManagmentService service = mock(TaskManagmentService.class);
+        TaskManagementService service = mock(TaskManagementService.class);
         TaskObjectModel taskObjectModel = new TaskObjectModel();
         taskObjectModel.setTaskName("Test Task");
         taskObjectModel.setTaskType("Test Type");
@@ -94,35 +94,23 @@ class TaskManagmentServiceTest {
     @DisplayName("Test createTask validates task correctly")
     void createTask_ValidatesTaskCorrectly() {
         //Arrange
-        TaskManagmentService service = spy(new TaskManagmentService());
+        TaskManagementService service = spy(new TaskManagementService());
         TaskObjectModel CorrecttaskObjectModel = new TaskObjectModel();
         CorrecttaskObjectModel.setTaskName("Test Task");
         CorrecttaskObjectModel.setTaskType("Test Type");
         CorrecttaskObjectModel.setTaskDescription("Test Description");
         CorrecttaskObjectModel.setTaskLevel("Test Level");
 
-
-
-        //Act
-        boolean result = service.validateTaskObjectModel(CorrecttaskObjectModel,this.mockAuthentication);
-        boolean result2 = service.validateTaskObjectModel(invalidNameNull,this.mockAuthentication);
-        boolean result3 = service.validateTaskObjectModel(invalidNameEmpty,this.mockAuthentication);
-        boolean result4 = service.validateTaskObjectModel(invalidTypeNull,this.mockAuthentication);
-        boolean result5 = service.validateTaskObjectModel(invalidTypeEmpty,this.mockAuthentication);
-        boolean result6 = service.validateTaskObjectModel(invalidLevelNull,this.mockAuthentication);
-        boolean result7 = service.validateTaskObjectModel(invalidLevelEmpty,this.mockAuthentication);
-        boolean result8 = service.validateTaskObjectModel(invalidDescNull,this.mockAuthentication);
-        boolean result9 = service.validateTaskObjectModel(invalidDescEmpty,this.mockAuthentication);
-        //Assert
-        assertTrue(result);
-        assertFalse(result2);
-        assertFalse(result3);
-        assertFalse(result4);
-        assertFalse(result5);
-        assertFalse(result6);
-        assertFalse(result7);
-        assertFalse(result8);
-        assertFalse(result9);
+        //Act and Assert
+        assertDoesNotThrow(() -> service.validateTaskObjectModel(CorrecttaskObjectModel,this.mockAuthentication));
+        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidNameNull,this.mockAuthentication));
+        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidNameEmpty,this.mockAuthentication));
+        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidTypeNull,this.mockAuthentication));
+        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidTypeEmpty,this.mockAuthentication));
+        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidLevelNull,this.mockAuthentication));
+        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidLevelEmpty,this.mockAuthentication));
+        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidDescNull,this.mockAuthentication));
+        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidDescEmpty,this.mockAuthentication));
 
         Mockito.verify(service,Mockito.atMost(9)).validateTaskObjectModel(CorrecttaskObjectModel,this.mockAuthentication);
 
@@ -132,7 +120,7 @@ class TaskManagmentServiceTest {
     @DisplayName("Test throws Error when entity not found")
     void entityNotFoundWhenTryingToUpdateTask() {
         //Arrange
-        TaskManagmentService service = new TaskManagmentService();
+        TaskManagementService service = new TaskManagementService();
         service.adaptorService = new AdaptorService();
         EntityManager entityManager = mock(EntityManager.class);
         service.adaptorService.setEntityManager(entityManager);
@@ -152,7 +140,7 @@ class TaskManagmentServiceTest {
     @DisplayName("Test throws Error when field not found")
     void testThrowsErrorWhenFieldNotFound() {
         //Arrange
-        TaskManagmentService service = new TaskManagmentService();
+        TaskManagementService service = new TaskManagementService();
         service.adaptorService = new AdaptorService();
         EntityManager entityManager = mock(EntityManager.class);
         service.adaptorService.setEntityManager(entityManager);
@@ -173,7 +161,7 @@ class TaskManagmentServiceTest {
     @DisplayName("Test throws Error when replacement not found")
     void testThrowsErrorWhenReplacementNotFound() {
         //Arrange
-        TaskManagmentService service = new TaskManagmentService();
+        TaskManagementService service = new TaskManagementService();
         service.adaptorService = new AdaptorService();
         EntityManager entityManager = mock(EntityManager.class);
         service.adaptorService.setEntityManager(entityManager);
@@ -195,7 +183,7 @@ class TaskManagmentServiceTest {
     @DisplayName("Test updateTask updates task name correctly")
     void testUpdateTaskUpdatesTaskNameCorrectly() {
         // Arrange
-        TaskManagmentService service = new TaskManagmentService();
+        TaskManagementService service = new TaskManagementService();
         AdaptorService adaptorService = mock(AdaptorService.class);
         service.adaptorService = adaptorService;
 
@@ -222,7 +210,7 @@ class TaskManagmentServiceTest {
     @DisplayName("Test updateTask throws error when entity not found")
     void deleteTask() {
         // Arrange
-        TaskManagmentService service = new TaskManagmentService();
+        TaskManagementService service = new TaskManagementService();
         AdaptorService adaptorService = mock(AdaptorService.class);
         service.adaptorService = adaptorService;
 
@@ -246,7 +234,7 @@ class TaskManagmentServiceTest {
     @DisplayName("Tests all tasks are fetched correctly")
     void fetchAllTasks() {
         // Arrange
-        TaskManagmentService service = new TaskManagmentService();
+        TaskManagementService service = new TaskManagementService();
         AdaptorService adaptorService = mock(AdaptorService.class);
         service.adaptorService = adaptorService;
 
@@ -309,7 +297,7 @@ class TaskManagmentServiceTest {
     @DisplayName("Tests task is fetched correctly Based on id")
     void fetchTaskWithId() {
         // Arrange
-        TaskManagmentService service = new TaskManagmentService();
+        TaskManagementService service = new TaskManagementService();
         AdaptorService adaptorService = mock(AdaptorService.class);
         service.adaptorService = adaptorService;
 
@@ -340,7 +328,7 @@ class TaskManagmentServiceTest {
     @DisplayName("Task throws and logs error when nothing is returned")
     void taskThrowsErrorWhenEntityManagerFailsToReturnAnything(){
         // Arrange
-        TaskManagmentService service = new TaskManagmentService();
+        TaskManagementService service = new TaskManagementService();
         AdaptorService adaptorService = mock(AdaptorService.class);
         service.adaptorService = adaptorService;
 
@@ -364,7 +352,7 @@ class TaskManagmentServiceTest {
         //method checks whether user either has authority as a suer or is the owner of the task
         //arrange
 
-        TaskManagmentService service = new TaskManagmentService();
+        TaskManagementService service = new TaskManagementService();
         Authentication authenticationRole = mock(Authentication.class);
         Authentication authenticationOwner = mock(Authentication.class);
 

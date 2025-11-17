@@ -26,7 +26,7 @@ public class HomeController {
     @Post("/v1Register")
     public HttpResponse<?> register(@Body UserDetailsModel userDetailsModel){
         System.out.println("Received register request");
-        System.out.println("Body: " + userDetailsModel.getUserName() + " | " + userDetailsModel.getEMAIL());
+        System.out.println("Body: " + userDetailsModel.getUsername() + " | " + userDetailsModel.getEmail());
         registrationService.register(userDetailsModel);
         log.info("User registered successfully");
         log.info("Creating player stats profile for user");

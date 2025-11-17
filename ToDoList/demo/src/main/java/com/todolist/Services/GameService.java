@@ -29,7 +29,7 @@ public class GameService {
     public void createPlayerStatsProfile(UserDetailsModel userDetailsModel) {
         try {
             PlayerStatsModel playerStatsModel = new PlayerStatsModel();
-            playerStatsModel.setPlayerUsername(userDetailsModel.getUserName());
+            playerStatsModel.setPlayerUsername(userDetailsModel.getUsername());
             playerStatsModel.setPlayerLevel(1);
             playerStatsModel.setPlayerXp(0);
             playerStatsModel.setXpToNextLevel(20);

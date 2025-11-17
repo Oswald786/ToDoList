@@ -36,10 +36,10 @@ public class JwtAuthenticationTest {
         PasswordHasher hasher = new PasswordHasher();
 
         UserDetailsModel testUser = new UserDetailsModel();
-        testUser.setUserName("sherlock");
+        testUser.setUsername("sherlock");
         testUser.setPassword(hasher.hashPassword("password"));
         testUser.setRole("USER");
-        testUser.setEMAIL("sherlock@example.com");
+        testUser.setEmail("sherlock@example.com");
 
         when(authAdaptorService.findUser(eq("sherlock"))).thenReturn(testUser);
 

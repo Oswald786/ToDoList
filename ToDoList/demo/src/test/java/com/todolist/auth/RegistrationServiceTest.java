@@ -35,7 +35,7 @@ class RegistrationServiceTest {
     void registerFailsWithUnhashedPassword() {
         // Arrange
         UserDetailsModel userDetailsModel = new UserDetailsModel();
-        userDetailsModel.setUserName("ETHAN");
+        userDetailsModel.setUsername("ETHAN");
         userDetailsModel.setPassword("unhashed");
         when(passwordHasher.hashPassword(eq("unhashed"))).thenReturn("unhashed");
 
@@ -52,12 +52,12 @@ class RegistrationServiceTest {
     void registerFailsWithExistingUser() {
         // Arrange
         UserDetailsModel userDetailsModel = new UserDetailsModel();
-        userDetailsModel.setUserName("ETHAN");
+        userDetailsModel.setUsername("ETHAN");
         userDetailsModel.setPassword("hashed");
         userDetailsModel.setRole("ROLE_USER");
         UserEntity userEntity = userMapper.toEntity(userDetailsModel);
         when(passwordHasher.hashPassword(eq("unhashed"))).thenCallRealMethod();
-        when(registrationService.entityManager.find(eq(UserEntity.class), eq(userDetailsModel.getUserName()))).thenReturn(userEntity);
+        when(registrationService.entityManager.find(eq(UserEntity.class), eq(userDetailsModel.getUsername()))).thenReturn(userEntity);
 
         //act
         assertThrows(IllegalArgumentException.class,() -> {
@@ -72,12 +72,12 @@ class RegistrationServiceTest {
     void registerFailsWithUnknownError() {
         // Arrange
         UserDetailsModel userDetailsModel = new UserDetailsModel();
-        userDetailsModel.setUserName("ETHAN");
+        userDetailsModel.setUsername("ETHAN");
         userDetailsModel.setPassword("hashed");
         userDetailsModel.setRole("ROLE_USER");
         UserEntity userEntity = userMapper.toEntity(userDetailsModel);
         when(passwordHasher.hashPassword(eq("unhashed"))).thenCallRealMethod();
-        when(registrationService.entityManager.find(eq(UserEntity.class), eq(userDetailsModel.getUserName()))).thenReturn(null);
+        when(registrationService.entityManager.find(eq(UserEntity.class), eq(userDetailsModel.getUsername()))).thenReturn(null);
 
         //act
         assertThrows(IllegalArgumentException.class,() -> {
@@ -90,12 +90,12 @@ class RegistrationServiceTest {
     void registerSucceeds() {
         // Arrange
         UserDetailsModel userDetailsModel = new UserDetailsModel();
-        userDetailsModel.setUserName("ETHAN");
+        userDetailsModel.setUsername("ETHAN");
         userDetailsModel.setPassword("unHashedPassword");
         userDetailsModel.setRole("ROLE_USER");
         UserEntity userEntity = userMapper.toEntity(userDetailsModel);
         when(passwordHasher.hashPassword(anyString())).thenReturn("hashedPassword");
-        when(registrationService.entityManager.find(eq(UserEntity.class), eq(userDetailsModel.getUserName()))).thenReturn(null);
+        when(registrationService.entityManager.find(eq(UserEntity.class), eq(userDetailsModel.getUsername()))).thenReturn(null);
 
         //act
         registrationService.register(userDetailsModel);

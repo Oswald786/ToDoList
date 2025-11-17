@@ -18,12 +18,10 @@ public class UserEntity {
     private Long id;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "USERNAME",unique = true)
-
     @Getter
     @Setter
-    private String userName;
+    private String username;
 
     @Column(name = "PASSWORD")
     @Getter
@@ -38,5 +36,5 @@ public class UserEntity {
     @Column(name = "EMAIL")
     @Getter
     @Setter
-    private String EMAIL;
+    private String email;
 }

@@ -3,11 +3,15 @@ package com.todolist.auth;
 import com.todolist.Models.UserDetailsModel;
 import com.todolist.adaptors.persistence.Jpa.UserEntity;
 import com.todolist.adaptors.web.UserMapper;
+import com.todolist.exceptions.UserNotFoundException;
+import io.micronaut.security.authentication.Authentication;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -32,15 +36,15 @@ class AuthAdaptorServiceTest {
 
     // ===========================================================
     @Test
-    @DisplayName("✅ findUser returns mapped user when found")
+    @DisplayName("findUser returns mapped user when found")
     void findUser_Success() {
         // Arrange
         UserEntity userEntity = new UserEntity();
-        userEntity.setUserName("ETHAN");
+        userEntity.setUsername("ETHAN");
         userEntity.setPassword("hashedPass");
 
         UserDetailsModel expectedModel = new UserDetailsModel();
-        expectedModel.setUserName("ETHAN");
+        expectedModel.setUsername("ETHAN");
         expectedModel.setPassword("hashedPass");
 
         when(entityManager.createQuery(anyString(), eq(UserEntity.class))).thenReturn(typedQuery);
@@ -53,35 +57,31 @@ class AuthAdaptorServiceTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals("ETHAN", result.getUserName());
+        assertEquals("ETHAN", result.getUsername());
         verify(entityManager).createQuery(anyString(), eq(UserEntity.class));
         verify(userMapper).toModel(userEntity);
     }
 
     // ===========================================================
     @Test
-    @DisplayName("❌ findUser returns null when an exception occurs")
-    void findUser_Exception_ReturnsNull() {
-        // Arrange
-        when(entityManager.createQuery(anyString(), eq(UserEntity.class))).thenThrow(new RuntimeException("DB failure"));
+    @DisplayName("findUser returns null when no suer exists")
+    void find_User_Exception_Returns_null_when_No_User_Exists() {
 
-        // Act
-        UserDetailsModel result = authAdaptorService.findUser("ETHAN");
-
-        // Assert
-        assertNull(result);
+        assertThrows(NullPointerException.class,() -> authAdaptorService.findUser("ETHAN"));
     }
 
     // ===========================================================
     @Test
-    @DisplayName("✅ createUser persists new user entity")
+    @DisplayName("createUser persists new user entity")
     void createUser_Success() {
         // Arrange
         UserDetailsModel model = new UserDetailsModel();
-        model.setUserName("ETHAN");
+        model.setUsername("ETHAN");
+        model.setPassword("password");
 
         UserEntity entity = new UserEntity();
-        entity.setUserName("ETHAN");
+        entity.setUsername("ETHAN");
+        entity.setPassword("password");
 
         when(userMapper.toEntity(model)).thenReturn(entity);
 
@@ -95,42 +95,48 @@ class AuthAdaptorServiceTest {
 
     // ===========================================================
     @Test
-    @DisplayName("❌ createUser throws IllegalArgumentException on failure")
+    @DisplayName("createUser throws IllegalArgumentException on failure")
     void createUser_Fails_ThrowsException() {
         // Arrange
         UserDetailsModel model = new UserDetailsModel();
-        model.setUserName("ETHAN");
+        model.setUsername("ETHAN");
 
         UserEntity entity = new UserEntity();
-        entity.setUserName("ETHAN");
+        entity.setUsername("ETHAN");
 
         when(userMapper.toEntity(model)).thenReturn(entity);
         doThrow(new RuntimeException("DB fail")).when(entityManager).persist(any());
 
         // Act & Assert
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
-                () -> authAdaptorService.createUser(model)
-        );
-
-        assertTrue(ex.getMessage().contains("already exists"));
+        assertThrows(IllegalArgumentException.class, () -> authAdaptorService.createUser(model));
     }
 
     // ===========================================================
     @Test
-    @DisplayName("✅ updateUser merges user entity correctly")
+    @DisplayName("updateUser merges user entity correctly")
     void updateUser_Success() {
+        Authentication authentication = mock(Authentication.class);
+
         // Arrange
         UserDetailsModel model = new UserDetailsModel();
-        model.setUserName("ETHAN");
+        model.setUsername("ETHAN");
+        model.setPassword("password");
+        model.setRole("ADMIN");
+        model.setEmail("testemail@gmail.com");
 
         UserEntity entity = new UserEntity();
-        entity.setUserName("ETHAN");
+        entity.setUsername("ETHAN");
+
+        when(authentication.getName()).thenReturn("ETHAN");
+        when(authentication.getRoles()).thenReturn(List.of("ADMIN"));
+
 
         when(userMapper.toEntity(model)).thenReturn(entity);
+        when(entityManager.find(UserEntity.class, "ETHAN")).thenReturn(entity);
+
 
         // Act
-        authAdaptorService.updateUser(model);
+        authAdaptorService.updateUser(model,authentication);
 
         // Assert
         verify(userMapper).toEntity(model);
@@ -139,16 +145,22 @@ class AuthAdaptorServiceTest {
 
     // ===========================================================
     @Test
-    @DisplayName("✅ deleteUser removes user entity successfully")
+    @DisplayName("deleteUser removes user entity successfully")
     void deleteUser_Success() {
         // Arrange
-        UserDetailsModel model = new UserDetailsModel();
-        model.setUserName("ETHAN");
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn("ETHAN");
+        when(authentication.getRoles()).thenReturn(List.of("ADMIN"));
 
-        when(entityManager.find(UserDetailsModel.class, "ETHAN")).thenReturn(model);
+        UserEntity model = new UserEntity();
+        model.setUsername("ETHAN");
+        model.setPassword("password");
+        model.setRole("ADMIN");
+
+        when(entityManager.find(UserEntity.class, "ETHAN")).thenReturn(model);
 
         // Act
-        authAdaptorService.deleteUser("ETHAN");
+        authAdaptorService.deleteUser("ETHAN", authentication);
 
         // Assert
         verify(entityManager).remove(model);

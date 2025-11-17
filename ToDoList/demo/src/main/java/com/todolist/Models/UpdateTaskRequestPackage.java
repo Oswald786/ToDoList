@@ -1,8 +1,12 @@
 package com.todolist.Models;
 
 import io.micronaut.serde.annotation.Serdeable;
+import lombok.Getter;
+import lombok.Setter;
 
 @Serdeable
+@Getter
+@Setter
 public class UpdateTaskRequestPackage {
 
     long id;
@@ -15,32 +19,5 @@ public class UpdateTaskRequestPackage {
         this.id = id;
         this.replacementValue = replacementValue;
         this.fieldToUpdate = fieldToUpdate;
-    }
-
-    public UpdateTaskRequestPackage() {
-    }
-
-    public String getFieldToUpdate() {
-        return fieldToUpdate;
-    }
-
-    public void setFieldToUpdate(String fieldToUpdate) {
-        this.fieldToUpdate = fieldToUpdate;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getReplacementValue() {
-        return replacementValue;
-    }
-
-    public void setReplacementValue(String replacementValue) {
-        this.replacementValue = replacementValue;
     }
 }

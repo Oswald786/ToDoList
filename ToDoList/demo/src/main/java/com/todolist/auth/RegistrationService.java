@@ -26,6 +26,7 @@ public class RegistrationService {
 
     @Inject
     GameService gameService;
+
     private static final Logger log = LoggerFactory.getLogger(RegistrationService.class);
 
 
@@ -36,37 +37,22 @@ public class RegistrationService {
             log.error("Password could not be hashed");
             throw new IllegalArgumentException("Password could not be hashed");
         }
+        UserDetailsModel userToAdd = userDetailsModelProvided;
+        userToAdd.setPassword(hashedPassword);
+        //Debugging and show whats been entered for security
+        System.out.println("===== USER REGISTRATION DEBUG =====");
+        System.out.println("Username: " + userToAdd.getUsername());
+        System.out.println("Email: " + userToAdd.getEmail());
+        System.out.println("Role (before set): " + userToAdd.getRole());
+        System.out.println("Hashed Password: " + hashedPassword);
+        System.out.println("===================================");
 
-        //save user
-        try {
-            UserDetailsModel userToAdd = userDetailsModelProvided;
-            userToAdd.setPassword(hashedPassword);
-            System.out.println("===== USER REGISTRATION DEBUG =====");
-            System.out.println("Username: " + userToAdd.getUserName());
-            System.out.println("Email: " + userToAdd.getEMAIL());
-            System.out.println("Role (before set): " + userToAdd.getRole());
-            System.out.println("Hashed Password: " + hashedPassword);
-            System.out.println("===================================");
-            UserEntity exsistingUser = null;
+        userToAdd.setRole("USER");
 
+        authAdaptorService.createUser(userToAdd);
 
-
-
-            if (exsistingUser != null) {
-                log.error("User with username ${userToAdd.getUserName()} already exists");
-                throw new IllegalArgumentException("User with username " + userToAdd.getUserName() + " already exists");
-            }
-            userToAdd.setRole("USER");
-
-
-            authAdaptorService.createUser(userToAdd);
-//            gameService.createPlayerStatsProfile(userToAdd);
-            //confirmation
-            System.out.println("User registered");
-        }catch (Exception e){
-            log.warn("Error registering user");
-            log.error(String.valueOf(e.getCause()));
-            throw new IllegalArgumentException("Error registering user");
-        }
+        gameService.createPlayerStatsProfile(userToAdd);
+        //confirmation
+        log.info("User registered");
     }
 }

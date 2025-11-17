@@ -9,7 +9,7 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
 import jakarta.inject.Inject;
 
-@Controller("/gamepoints")
+@Controller("/gamePoints")
 @Secured({"USER","ADMIN"})
 public class GamePointsController {
 
@@ -17,7 +17,7 @@ public class GamePointsController {
     @Inject
     GameService gameService;
 
-    @Post("/v1rewardtaskcompletion")
+    @Post("/v1rewardTaskCompletion")
     public void rewardTaskCompletion(@Body TaskObjectModel taskObjectModel, Authentication Authentication){
         try{
             gameService.addXPForTaskCompletion(taskObjectModel, Authentication);

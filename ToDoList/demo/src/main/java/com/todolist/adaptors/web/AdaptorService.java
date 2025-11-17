@@ -4,6 +4,7 @@ package com.todolist.adaptors.web;
 import com.todolist.Models.TaskObjectModel;
 import com.todolist.Models.UpdateTaskRequestPackage;
 import com.todolist.adaptors.persistence.Jpa.TaskEntity;
+import com.todolist.exceptions.TaskNotFoundException;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
@@ -49,7 +50,7 @@ public class AdaptorService {
         ArrayList<TaskObjectModel> taskObjectModels = new ArrayList<>();
 
         //need to add a parameter for the task owner id here to ensure that only tasks owned by the owner are returned
-        //also add some error handling and soem catches for if this is not the case
+        //also add some error handling and some catches for if this is not the case
         TypedQuery<TaskEntity> query = entityManager.createQuery("SELECT t FROM TaskEntity t", TaskEntity.class);
         List<TaskEntity> resultList = query.getResultList();
         for(TaskEntity taskEntity: resultList){
@@ -63,7 +64,7 @@ public class AdaptorService {
         ArrayList<TaskObjectModel> taskObjectModelsOwned = new ArrayList<>();
 
         //need to add a parameter for the task owner id here to ensure that only tasks owned by the owner are returned
-        //also add some error handling and soem catches for if this is not the case
+        //also add some error handling and some catches for if this is not the case
         TypedQuery<TaskEntity> query = entityManager.createQuery("SELECT t FROM TaskEntity t WHERE t.taskOwnerId = :owner", TaskEntity.class);
         query.setParameter("owner", taskOwnerId);
         List<TaskEntity> resultList = query.getResultList();
@@ -80,8 +81,7 @@ public class AdaptorService {
             TaskEntity entity = entityManager.find(TaskEntity.class, id);
 
             if(entity == null){
-                log.error("Task with id " + id + " does not exist illegal argument exception thrown");
-                throw new IllegalArgumentException("Task with id " + id + " does not exist");
+                throw new TaskNotFoundException("Task with id " + id + " does not exist");
             }
 
             return taskMapper.toModel(entity);
@@ -118,16 +118,16 @@ public class AdaptorService {
                 entity.setTaskDescription(updateTaskRequestPackage.getReplacementValue());
                 break;
             default:
-                throw new IllegalArgumentException("Field " + updateTaskRequestPackage.getFieldToUpdate() + " does not exist");
+                throw new TaskNotFoundException("Field " + updateTaskRequestPackage.getFieldToUpdate() + " does not exist");
         }
     }
     //Delete
     @Transactional
     public void deleteTask(long id){
         TaskEntity entity = entityManager.find(TaskEntity.class, id);
-        //check heare as well the owner has permission to delete the task by checking the task owner id provided
+        //check here as well the owner has permission to delete the task by checking the task owner id provided
         if (entity == null) {
-            throw new IllegalArgumentException("Task with id " + id + " does not exist");
+            throw new TaskNotFoundException("Task with id " + id + " does not exist");
         }
         entityManager.remove(entity);
     }

@@ -9,7 +9,7 @@ import lombok.Setter;
 public class UserDetailsModel {
     long id;
 
-    String userName;
+    String username;
 
 
     String password;
@@ -18,16 +18,16 @@ public class UserDetailsModel {
     String role;
 
 
-    String EMAIL;
+    String email;
 
 
 
 
-    public UserDetailsModel(String userName, String password, String role, String EMAIL) {
-        this.userName = userName;
+    public UserDetailsModel(String userName, String password, String role, String email) {
+        this.username = userName;
         this.password = password;
         this.role = role;
-        this.EMAIL = EMAIL;
+        this.email = email;
     }
 
     public UserDetailsModel() {

@@ -15,7 +15,7 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="@localhost" uuid="0ad2d328-354e-4bcc-8514-dcc733e549ca">
+    <data-source source="LOCAL" name="@localhost" uuid="09cb6bf1-fac9-4f6a-a95f-30410b28a8d5">
       <driver-ref>oracle.19</driver-ref>
       <synchronize>true</synchronize>
       <auto-commit>false</auto-commit>

@@ -37,13 +37,11 @@ async function Register() {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                userName: username,
-                EMAIL: email,
+                username: username,
+                email: email,
                 password: password,
             })
         })
-        window.location.href = "http://localhost:63342/LoginPage.html";
-        await response;
         if (response.status === 200) {
             alert("Registration Successful");
             // setTimeout(() => {

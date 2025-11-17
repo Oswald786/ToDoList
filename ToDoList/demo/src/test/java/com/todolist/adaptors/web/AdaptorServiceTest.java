@@ -3,6 +3,7 @@ package com.todolist.adaptors.web;
 import com.todolist.Models.TaskObjectModel;
 import com.todolist.Models.UpdateTaskRequestPackage;
 import com.todolist.adaptors.persistence.Jpa.TaskEntity;
+import com.todolist.exceptions.TaskNotFoundException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.Assertions;
@@ -154,9 +155,7 @@ class AdaptorServiceTest {
 
         when(adaptorService.entityManager.find(TaskEntity.class, 1L)).thenReturn(null);
         //Act
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            adaptorService.retrieveTask(1L);
-        });
+        Assertions.assertThrows(TaskNotFoundException.class, () -> {adaptorService.retrieveTask(1L);});
         verify(adaptorService.entityManager, times(1)).find(TaskEntity.class, 1L);
         verify(adaptorService.taskMapper, never()).toModel(any(TaskEntity.class));
     }
@@ -228,10 +227,8 @@ class AdaptorServiceTest {
 
         UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "Value", "invalidField");
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> adaptorService.updateTask(req));
+        assertThrows(TaskNotFoundException.class, () -> adaptorService.updateTask(req));
 
-        assertEquals("Field invalidField does not exist", exception.getMessage());
     }
 
     @Test
@@ -264,12 +261,7 @@ class AdaptorServiceTest {
         when(adaptorService.entityManager.find(TaskEntity.class, 99L)).thenReturn(null);
 
         // Act + Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> adaptorService.deleteTask(99L)
-        );
-
-        assertEquals("Task with id 99 does not exist", exception.getMessage());
+        assertThrows(TaskNotFoundException.class, () -> adaptorService.deleteTask(99L));
         verify(adaptorService.entityManager, times(0)).remove(any());
     }
 }
