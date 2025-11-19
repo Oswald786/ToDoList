@@ -251,8 +251,8 @@ async function removeSelectedTask(taskId) {
 async function updateSelectedTask(taskId,taskAttributeToUpdate,taskAttributeValue) {
     let taskUpdatePackage = {
         id: taskId,
-        fieldToUpdate: taskAttributeToUpdate,
-        replacementValue: taskAttributeValue
+        replacementValue: taskAttributeValue,
+        fieldToUpdate: taskAttributeToUpdate
     }
     await apiRequest(`http://localhost:8080/v1taskManagementController/updateTask`, "POST", taskUpdatePackage);
     await loadTasks();
@@ -260,7 +260,9 @@ async function updateSelectedTask(taskId,taskAttributeToUpdate,taskAttributeValu
 
 //function to build the tasks when it is retrieved from the database
 function renderTaskHtml(task) {
-    return  `<div class="container-md m-7">
+    return  `
+    <div class="container-md m-7">
+    <ul>
         <li class="m-3">
             <div data-task-id="${task.id}">
                 <p>Task Name: <span>${task.taskName}</span></p>
@@ -299,6 +301,7 @@ function renderTaskHtml(task) {
                 </div>
             </div>
         </li>
+    </ul>
     </div>`;
 }
 
@@ -340,6 +343,12 @@ function attachTaskEventListeners() {
             let taskAttributeValue = document.getElementById(`TaskAttributeValue_${taskId}`).value;
             await updateSelectedTask(taskId,taskAttributeToUpdate,taskAttributeValue);
             await loadTasks();
+            BringUpEditTaskMenu(taskId);
         })
     })
 }
+//Add Task Buttons
+document.getElementById("addTask").addEventListener("click", async () => {
+    await addTask();
+    await loadTasks();
+});

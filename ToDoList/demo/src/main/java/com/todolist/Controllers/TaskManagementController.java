@@ -3,10 +3,7 @@ package com.todolist.Controllers;
 import com.todolist.Models.TaskObjectModel;
 import com.todolist.Models.UpdateTaskRequestPackage;
 import com.todolist.Services.TaskManagementService;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Delete;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
 import jakarta.inject.Inject;
@@ -39,7 +36,7 @@ public class TaskManagementController {
     }
 
     @Post("/updateTask")
-    public void updateTask(UpdateTaskRequestPackage updateTaskRequestPackage, Authentication authentication){
+    public void updateTask(@Body UpdateTaskRequestPackage updateTaskRequestPackage, Authentication authentication){
         this.taskManagementService.updateTask(updateTaskRequestPackage,authentication);
     }
 
