@@ -110,7 +110,10 @@ public class GameService {
 
     //Grant level reward (Optional)
 
-    //Get progress (Optional)
+    //Get progress player stats and return as model
+    public PlayerStatsModel getPlayerStats(Authentication authentication){
+        return playerStatsMapper.toModel(adaptorServicePlayerStats.retrievePlayerStats(authentication));
+    }
 
 
 }

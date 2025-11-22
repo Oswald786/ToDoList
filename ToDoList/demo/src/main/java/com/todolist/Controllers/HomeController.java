@@ -29,8 +29,6 @@ public class HomeController {
         System.out.println("Body: " + userDetailsModel.getUsername() + " | " + userDetailsModel.getEmail());
         registrationService.register(userDetailsModel);
         log.info("User registered successfully");
-        log.info("Creating player stats profile for user");
-        gameService.createPlayerStatsProfile(userDetailsModel);
         return HttpResponse.ok("User registered successfully");
     }
 

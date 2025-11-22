@@ -153,7 +153,68 @@
 ///VERSION 2.0 BABY
 
 
-window.onload = loadTasks;
+window.onload = async () => {
+    await loadTasks();
+    await RenderUserInfo();
+    await DisplayXpProgressBar();
+}
+
+//retrieving user information
+let currentUser = null;
+async function getUserInfo() {
+    if (!currentUser) {
+        currentUser = await apiRequest("http://localhost:8080/v1GamePoints/RetrievePlayerStats", "GET");
+        console.log(currentUser);
+        return currentUser;
+    }else{
+        return currentUser;
+    }
+}
+
+async function getUserName() {
+    const userInfo = await getUserInfo();
+    return userInfo.playerUsername;
+}
+
+async function getUserLevel(){
+    const userInfo = await getUserInfo();
+    return userInfo.playerLevel
+}
+
+async function GetUserXpNeededForNextLevel(){
+    const userInfo = await getUserInfo();
+    return userInfo.xpToNextLevel
+}
+async function GetUserXp(){
+    const userInfo = await getUserInfo();
+    return userInfo.playerXp
+}
+
+async function GetUserXpPercentage(){
+    let xpNeededForNextLevel = await GetUserXpNeededForNextLevel();
+    let currentXp = await GetUserXp();
+    return (currentXp/xpNeededForNextLevel)*100;
+
+}
+
+async function  DisplayXpProgressBar(){
+    let xp = await GetUserXpPercentage();
+    const progressBar = document.querySelector('[role="progressbar"]');
+    progressBar.style.width = `${xp}%`;
+}
+
+async function RenderUserInfo(){
+    usernamenode = document.getElementById("username");
+    usernamenode.innerHTML = await getUserName();
+    userlevelnode = document.getElementById("userLevel");
+    userlevelnode.innerHTML = await getUserLevel();
+}
+
+async function RenderUserDataAndXpBar(){
+    await RenderUserInfo();
+    await DisplayXpProgressBar();
+}
+
 //API Request Helper
 async function apiRequest(url, method, body = null) {
     let preBuiltRequestBody = {
@@ -183,7 +244,6 @@ async function apiRequest(url, method, body = null) {
             throw err;
         }
     }
-
 }
 
 function newTaskBuilder(taskName, taskType, taskLevel, taskDescription) {
@@ -222,6 +282,7 @@ async function addTask() {
     await apiRequest("http://localhost:8080/v1taskManagementController/createTask", "POST", taskObjectModel);
 
     //Reload the tasks
+    currentUser = null;
     await loadTasks();
 }
 async function loadTasks() {
@@ -231,7 +292,8 @@ async function loadTasks() {
     for (let i = 0; i < response.length; i++) {
         taskListDomElement.innerHTML += renderTaskHtml(response[i]);
     }
-    attachTaskEventListeners();
+    await attachTaskEventListeners();
+    await RenderUserDataAndXpBar();
 }
 
 async function getTasks() {
@@ -244,6 +306,7 @@ async function removeSelectedTask(taskId) {
         id: taskId
     }
     await apiRequest(`http://localhost:8080/v1taskManagementController/deleteTask`, "DELETE", taskRemovalPackage);
+    currentUser = null;
     await loadTasks();
 }
 
@@ -255,6 +318,7 @@ async function updateSelectedTask(taskId,taskAttributeToUpdate,taskAttributeValu
         fieldToUpdate: taskAttributeToUpdate
     }
     await apiRequest(`http://localhost:8080/v1taskManagementController/updateTask`, "POST", taskUpdatePackage);
+    currentUser = null;
     await loadTasks();
 }
 
@@ -346,6 +410,12 @@ function attachTaskEventListeners() {
             BringUpEditTaskMenu(taskId);
         })
     })
+
+    //Attach the Logout Button to the page
+    document.getElementById("logoutButton").addEventListener("click", () => {
+        localStorage.removeItem("jwtToken");
+        window.location.href = "LoginPage.html";
+    });
 }
 //Add Task Buttons
 document.getElementById("addTask").addEventListener("click", async () => {

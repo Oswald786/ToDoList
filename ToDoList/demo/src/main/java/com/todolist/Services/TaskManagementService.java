@@ -22,6 +22,9 @@ public class TaskManagementService {
     @Inject
     AdaptorService adaptorService;
 
+    @Inject
+    GameService gameService;
+
 
 
 
@@ -80,6 +83,7 @@ public class TaskManagementService {
         }
         adaptorService.deleteTask(id);
         log.info("Task deleted");
+        gameService.addXPForTaskCompletion(taskToDelete,authentication);
     }
 
     public ArrayList<TaskObjectModel> fetchAllTasks(Authentication authentication){

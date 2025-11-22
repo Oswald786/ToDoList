@@ -5,7 +5,8 @@ micronaut:
       configurations:
         default:
           allowed-origins:
-            - http://localhost:63342
+            - "http://localhost:63342"
+            - "http://localhost:8080"
           allowed-methods:
             - GET
             - POST
