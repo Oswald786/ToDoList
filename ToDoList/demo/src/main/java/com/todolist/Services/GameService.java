@@ -6,6 +6,10 @@ import com.todolist.Models.UserDetailsModel;
 import com.todolist.adaptors.persistence.Jpa.PlayerStatsEntity;
 import com.todolist.adaptors.web.AdaptorServicePlayerStats;
 import com.todolist.adaptors.web.PlayerStatsMapper;
+import com.todolist.exceptions.MapperFailedException;
+import com.todolist.exceptions.PermissionDeniedException;
+import com.todolist.exceptions.PlayerStatsNotFound;
+import com.todolist.exceptions.PlayerUsernameNotProvided;
 import io.micronaut.security.authentication.Authentication;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -27,30 +31,34 @@ public class GameService {
 
     //add a new player stats profile if not exists
     public void createPlayerStatsProfile(UserDetailsModel userDetailsModel) {
-        try {
-            PlayerStatsModel playerStatsModel = new PlayerStatsModel();
-            playerStatsModel.setPlayerUsername(userDetailsModel.getUsername());
-            playerStatsModel.setPlayerLevel(1);
-            playerStatsModel.setPlayerXp(0);
-            playerStatsModel.setXpToNextLevel(20);
-            adaptorServicePlayerStats.createPlayerStats(playerStatsModel);
-        }catch (Exception e){
-            log.error(String.valueOf(e.getCause()));
-            throw new IllegalArgumentException("Error creating player stats profile");
+        if (userDetailsModel == null || userDetailsModel.getUsername() == null || userDetailsModel.getUsername().isBlank()){
+            throw new PlayerUsernameNotProvided("Player username cannot be null or blank");
         }
+        PlayerStatsModel playerStatsModel = new PlayerStatsModel();
+        playerStatsModel.setPlayerUsername(userDetailsModel.getUsername());
+        playerStatsModel.setPlayerLevel(1);
+        playerStatsModel.setPlayerXp(0);
+        playerStatsModel.setXpToNextLevel(20);
+        adaptorServicePlayerStats.createPlayerStats(playerStatsModel);
     }
 
 
     //Calculate XP Reward for task completion
     public int calculateXP(TaskObjectModel taskObjectModel, Authentication authentication){
+        validatePlayerAuthentication(authentication,"CalculateXP method");
+        if(taskObjectModel == null || taskObjectModel.getTaskLevel() == null){
+            throw new IllegalArgumentException("Task level cannot be null");
+        }
+        try {
+            Integer.parseInt(taskObjectModel.getTaskLevel());
+        }catch (NumberFormatException e){
+            throw new IllegalArgumentException("Task level must be a number");
+        }
+        //Authentication checker
         int baseXp = Integer.parseInt(taskObjectModel.getTaskLevel()) * 20;
-
         PlayerStatsEntity User = adaptorServicePlayerStats.retrievePlayerStats(authentication);
-
         double levelScaling = Math.max(1.00 - (User.getPlayerLevel() * 0.02), 0.4);
-
         int totalXp = (int) (baseXp * levelScaling);
-
         log.info("XP Reward for {} is {}", authentication.getName(), totalXp);
         return totalXp;
     }
@@ -58,51 +66,58 @@ public class GameService {
 
     //Add XP to the user profile
     public void addXPForTaskCompletion(TaskObjectModel taskObjectModel, Authentication authentication){
+        validatePlayerAuthentication(authentication,"AddXPForTaskCompletion method");
+        if(taskObjectModel == null || taskObjectModel.getTaskLevel() == null){
+            throw new IllegalArgumentException("Task level cannot be null");
+        }
         int xp = calculateXP(taskObjectModel, authentication);
         PlayerStatsModel playerStatsModel = playerStatsMapper.toModel(adaptorServicePlayerStats.retrievePlayerStats(authentication));
         playerStatsModel.setPlayerXp(playerStatsModel.getPlayerXp() + xp);
-        if(playerStatsModel.getPlayerXp() >= playerStatsModel.getXpToNextLevel()){
-            levelUp(authentication);
-            log.info("User {} has leveled up", authentication.getName());
-        } else {
-            log.info("User {} has not leveled up", authentication.getName());
-            log.info("User {} has {} XP remaining", authentication.getName(), playerStatsModel.getXpToNextLevel() - playerStatsModel.getPlayerXp());
-            adaptorServicePlayerStats.updatePlayerStats(playerStatsModel, authentication);
+        int levelUpCounter = 0;
+        while(playerStatsModel.getPlayerXp() >= playerStatsModel.getXpToNextLevel()){
+            levelUp(playerStatsModel,authentication);
+            levelUpCounter++;
         }
-    }
-
-    //Level up the user profile if needed
-    private void levelUp(Authentication authentication){
-        // Retrieve the user's current stats as a model
-        PlayerStatsModel playerStatsModel = playerStatsMapper.toModel(
-                adaptorServicePlayerStats.retrievePlayerStats(authentication)
-        );
-
-        // --- Level-up logic ---
-        int oldLevel = playerStatsModel.getPlayerLevel();
-        int newLevel = oldLevel + 1;
-
-        // Optional: Carry over leftover XP instead of resetting to zero
-        int overflowXp = playerStatsModel.getPlayerXp() - playerStatsModel.getXpToNextLevel();
-        if (overflowXp < 0) overflowXp = 0;
-
-        playerStatsModel.setPlayerLevel(newLevel);
-        playerStatsModel.setPlayerXp(overflowXp);
-        playerStatsModel.setXpToNextLevel(calculateNewLevelUpThreshold(playerStatsModel));
-
-        log.info("🎉 User {} leveled up! Old Level: {}, New Level: {}, XP carried over: {}",
-                authentication.getName(), oldLevel, newLevel, overflowXp);
-
-        // --- Persist the updated data ---
+        if(levelUpCounter > 0){
+            log.info("User {} has leveled up {} times", authentication.getName(), levelUpCounter);
+        }
+        log.info("User {} has {} XP remaining", authentication.getName(), playerStatsModel.getXpToNextLevel() - playerStatsModel.getPlayerXp());
         adaptorServicePlayerStats.updatePlayerStats(playerStatsModel, authentication);
     }
 
+    //Level up the user profile if needed
+    private void levelUp(PlayerStatsModel playerStatsModelBeingUsed,Authentication authentication){
+        validatePlayerAuthentication(authentication,"LevelUp method");
+        // Retrieve the user's current stats as a model
+
+        // --- Level-up logic ---
+        int oldLevel = playerStatsModelBeingUsed.getPlayerLevel();
+        int newLevel = oldLevel + 1;
+
+        // Optional: Carry over leftover XP instead of resetting to zero
+        int overflowXp = playerStatsModelBeingUsed.getPlayerXp() - playerStatsModelBeingUsed.getXpToNextLevel();
+        if (overflowXp < 0) overflowXp = 0;
+
+        playerStatsModelBeingUsed.setPlayerLevel(newLevel);
+        playerStatsModelBeingUsed.setPlayerXp(overflowXp);
+        playerStatsModelBeingUsed.setXpToNextLevel(calculateNewLevelUpThreshold(playerStatsModelBeingUsed));
+
+        log.info(" User {} leveled up! Old Level: {}, New Level: {}, XP carried over: {}",
+                authentication.getName(), oldLevel, newLevel, overflowXp);
+    }
+
     private int calculateNewLevelUpThreshold(PlayerStatsModel playerStatsModel){
+        if(playerStatsModel == null){
+            throw new PlayerStatsNotFound("Player stats not found Unable to calculate new level up threshold");
+        }else if(playerStatsModel.getPlayerUsername() == null || playerStatsModel.getPlayerUsername().isEmpty()){
+            throw new MapperFailedException("Mapper failed to map player stats to model at calculateNewLevelUpThreshold method.");
+        }
         return playerStatsModel.getPlayerLevel() * 20;
     }
 
     //Calculate XP needed to level up
     public int calculateXPToLevelUp(Authentication authentication){
+        validatePlayerAuthentication(authentication,"CalculateXPToLevelUp method");
         PlayerStatsEntity entityReturned = adaptorServicePlayerStats.retrievePlayerStats(authentication);
         return entityReturned.getXpToNextLevel() - entityReturned.getPlayerXp();
     }
@@ -112,8 +127,24 @@ public class GameService {
 
     //Get progress player stats and return as model
     public PlayerStatsModel getPlayerStats(Authentication authentication){
+        validatePlayerAuthentication(authentication,"GetPlayerStats method");
         return playerStatsMapper.toModel(adaptorServicePlayerStats.retrievePlayerStats(authentication));
     }
 
 
+    //Validate player Authentication
+    public void validatePlayerAuthentication(Authentication authentication,String ErrorLocation) {
+       if (authentication == null || authentication.getName() == null) {
+           throw new IllegalStateException("Authentication is null or username is null at " + ErrorLocation + ".");
+       }
+       else if(authentication.getRoles().isEmpty()) {
+           throw new PermissionDeniedException("User does not have permission to access this resource at " + ErrorLocation + ".");
+       }
+       PlayerStatsModel playerStatsModel = playerStatsMapper.toModel(adaptorServicePlayerStats.retrievePlayerStats(authentication));
+       if(playerStatsModel == null){
+           throw new PlayerStatsNotFound("Player stats not found for user " + authentication.getName() + " at " + ErrorLocation + ".");
+       }else if(playerStatsModel.getPlayerUsername() == null || playerStatsModel.getPlayerUsername().isEmpty()){
+           throw new MapperFailedException("Mapper failed to map player stats to model at " + ErrorLocation + ".");
+       }
+       }
 }

@@ -4,6 +4,7 @@ package com.todolist.adaptors.web;
 import com.todolist.Models.TaskObjectModel;
 import com.todolist.Models.UpdateTaskRequestPackage;
 import com.todolist.adaptors.persistence.Jpa.TaskEntity;
+import com.todolist.exceptions.MapperFailedException;
 import com.todolist.exceptions.TaskNotFoundException;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -11,12 +12,15 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@Getter
+@Setter
 @Singleton
 public class AdaptorService {
     @PersistenceContext
@@ -39,112 +43,191 @@ public class AdaptorService {
     //Create
     @Transactional
     public void createTask(TaskObjectModel taskObjectModel){
-        entityManager.persist(taskMapper.toEntity(taskObjectModel));
-        System.out.println("Task created");
+        // Validate the incoming model
+        validateTaskObjectModel(taskObjectModel);
+        try {
+            TaskEntity entity = taskMapper.toEntity(taskObjectModel);
+            if (entity == null) {
+                throw new IllegalStateException("TaskMapper failed to map TaskObjectModel to TaskEntity");
+            }
+            entityManager.persist(entity);
+            log.info("Task created for owner '{}' with name '{}'", taskObjectModel.getTaskOwnerId(), taskObjectModel.getTaskName());
+        } catch (Exception e) {
+            log.error("Error creating task: {}", e.getMessage());
+            throw new RuntimeException("Unable to create task", e);
+        }
     }
 
 
     //Read
     @Transactional
     public ArrayList<TaskObjectModel> fetchAllTaskModels(){
-        ArrayList<TaskObjectModel> taskObjectModels = new ArrayList<>();
+        try {
+            TypedQuery<TaskEntity> query = entityManager.createQuery("SELECT t FROM TaskEntity t", TaskEntity.class);
 
-        //need to add a parameter for the task owner id here to ensure that only tasks owned by the owner are returned
-        //also add some error handling and some catches for if this is not the case
-        TypedQuery<TaskEntity> query = entityManager.createQuery("SELECT t FROM TaskEntity t", TaskEntity.class);
-        List<TaskEntity> resultList = query.getResultList();
-        for(TaskEntity taskEntity: resultList){
-           taskObjectModels.add(taskMapper.toModel(taskEntity));
+            List<TaskEntity> taskEntities = query.getResultList();
+            ArrayList<TaskObjectModel> taskModels = new ArrayList<>();
+
+            for (TaskEntity entity : taskEntities) {
+                TaskObjectModel model = taskMapper.toModel(entity);
+                if (model == null) {
+                    log.error("TaskMapper returned null for TaskEntity with id {}", entity.getId());
+                    throw new MapperFailedException("Task mapping failed — model was null for entity id " + entity.getId());
+                }
+                taskModels.add(model);
+            }
+            log.info("Fetched {} tasks from database (admin view)", taskModels.size());
+            return taskModels;
+        } catch (Exception e) {
+            log.error("Error fetching tasks: {}", e.getMessage());
+            throw new RuntimeException("Unable to fetch tasks", e);
         }
-        return taskObjectModels;
     }
 
     @Transactional
     public ArrayList<TaskObjectModel> fetchAllTasksByOwner(String taskOwnerId){
-        ArrayList<TaskObjectModel> taskObjectModelsOwned = new ArrayList<>();
 
-        //need to add a parameter for the task owner id here to ensure that only tasks owned by the owner are returned
-        //also add some error handling and some catches for if this is not the case
-        TypedQuery<TaskEntity> query = entityManager.createQuery("SELECT t FROM TaskEntity t WHERE t.taskOwnerId = :owner", TaskEntity.class);
-        query.setParameter("owner", taskOwnerId);
-        List<TaskEntity> resultList = query.getResultList();
-        for(TaskEntity taskEntity: resultList){
-            taskObjectModelsOwned.add(taskMapper.toModel(taskEntity));
+        if(taskOwnerId == null || taskOwnerId.isBlank()){
+            throw new IllegalArgumentException("Task owner ID cannot be null or blank");
         }
-        return taskObjectModelsOwned;
+        try {
+            ArrayList<TaskObjectModel> taskObjectModelsOwned = new ArrayList<>();
+
+            TypedQuery<TaskEntity> query = entityManager.createQuery("SELECT t FROM TaskEntity t WHERE t.taskOwnerId = :owner", TaskEntity.class);
+            query.setParameter("owner", taskOwnerId);
+
+            List<TaskEntity> resultList = query.getResultList();
+
+            for (TaskEntity taskEntity : resultList) {
+                TaskObjectModel taskObjectModel = taskMapper.toModel(taskEntity);
+                if (taskObjectModel == null) {
+                    log.error("Task mapper returned null for TaskEntity with id {}", taskEntity.getId());
+                    throw new MapperFailedException("Task mapping failed — model was null for entity id " + taskEntity.getId());
+                }
+                taskObjectModelsOwned.add(taskObjectModel);
+            }
+            return taskObjectModelsOwned;
+        }catch (Exception e){
+            log.error("Error fetching tasks for owner: {}", e.getMessage());
+            throw new RuntimeException("Unable to fetch tasks for owner", e);
+        }
     }
 
     @Transactional
     public TaskObjectModel retrieveTask(Long id){
         //need to add a parameter for the task owner id here to ensure that only tasks owned by the owner are returned
         //also add some error handling and some catches for if this is not the case
-            TaskEntity entity = entityManager.find(TaskEntity.class, id);
-
-            if(entity == null){
-                throw new TaskNotFoundException("Task with id " + id + " does not exist");
-            }
-
-            return taskMapper.toModel(entity);
-
+        if(id == null){
+            throw new IllegalArgumentException("Task id cannot be null");
+        }
+        TaskEntity entity = entityManager.find(TaskEntity.class, id);
+        if(entity == null){
+            throw new TaskNotFoundException("Task with id " + id + " does not exist");
+        }
+        try {
+            TaskObjectModel taskObjectModel = taskMapper.toModel(entity);
+            validateTaskObjectModel(taskObjectModel);
+            log.info("Task with id {} retrieved successfully", id);
+            return taskObjectModel;
+        }catch (Exception e){
+            log.error("Error retrieving task with id: {} , message: {}",id, e.getMessage());
+            throw new RuntimeException("Unable to retrieve task with id: " + id, e);
+        }
     }
 
 
     //Update
     @Transactional
     public void updateTask(UpdateTaskRequestPackage updateTaskRequestPackage) {
-        TaskEntity entity = entityManager.find(TaskEntity.class, updateTaskRequestPackage.getId());
-        if (entity == null) {
-            throw new IllegalArgumentException("Task with id " + updateTaskRequestPackage.getId() + " does not exist");
-        }
         if (updateTaskRequestPackage.getFieldToUpdate() == null || updateTaskRequestPackage.getFieldToUpdate().isBlank()) {
             throw new IllegalArgumentException("Field to update cannot be null or blank");
         }
         if (updateTaskRequestPackage.getReplacementValue() == null || updateTaskRequestPackage.getReplacementValue().isBlank()) {
             throw new IllegalArgumentException("Replacement value cannot be null or blank");
         }
-        //need a check here to validate the owner of the task attempting to be updated matches the task owner id provided
-        //also add some error handling and some catches for if this is not the case
-        switch (updateTaskRequestPackage.getFieldToUpdate()) {
-            case "taskName":
-                entity.setTaskName(updateTaskRequestPackage.getReplacementValue());
-                break;
-            case "taskType":
-                entity.setTaskType(updateTaskRequestPackage.getReplacementValue());
-                break;
-            case "taskLevel":
-                entity.setTaskLevel(updateTaskRequestPackage.getReplacementValue());
-                break;
-            case "taskDescription":
-                entity.setTaskDescription(updateTaskRequestPackage.getReplacementValue());
-                break;
-            default:
-                throw new TaskNotFoundException("Field " + updateTaskRequestPackage.getFieldToUpdate() + " does not exist");
+        try {
+            //Confirm the Task is valid and exists
+            TaskObjectModel existingModel = retrieveTask(updateTaskRequestPackage.getId());
+
+            //Used so changes are tracked by entity manager and saved
+            TaskEntity entity = entityManager.find(TaskEntity.class, updateTaskRequestPackage.getId());
+
+            String field = updateTaskRequestPackage.getFieldToUpdate();
+            String value = updateTaskRequestPackage.getReplacementValue();
+
+            // Extra field-specific validation
+            if (field.equals("taskLevel")) {
+                try {
+                    Integer.parseInt(value);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("taskLevel must be numeric");
+                }
+            }
+
+            // Update only the allowed fields
+            switch (field) {
+                case "taskName":
+                    entity.setTaskName(value);
+                    break;
+                case "taskType":
+                    entity.setTaskType(value);
+                    break;
+                case "taskLevel":
+                    entity.setTaskLevel(value);
+                    break;
+                case "taskDescription":
+                    entity.setTaskDescription(value);
+                    break;
+                default:
+                    throw new TaskNotFoundException("Field " + updateTaskRequestPackage.getFieldToUpdate() + " does not exist");
+            }
+            // Optional logging (helpful for auditing)
+            log.info("Task with id {} updated field '{}' to '{}'", updateTaskRequestPackage.getId(), field, value);
+        } catch (Exception e) {
+            log.error("Error updating task with id {}: {}", updateTaskRequestPackage.getId(), e.getMessage());
+            throw new RuntimeException("Unable to update task with id " + updateTaskRequestPackage.getId(), e);
         }
     }
     //Delete
     @Transactional
     public void deleteTask(long id){
-        TaskEntity entity = entityManager.find(TaskEntity.class, id);
-        //check here as well the owner has permission to delete the task by checking the task owner id provided
-        if (entity == null) {
-            throw new TaskNotFoundException("Task with id " + id + " does not exist");
+        if(id == 0 || id < 0){
+            log.warn("Attempt to delete task with id {} was ignored", id);
+            log.error("Failed to delete task with id {}",id);
+            throw new IllegalArgumentException("Task id cannot be null or less than zero");
         }
-        entityManager.remove(entity);
+        try {
+            //checkTask existence
+            TaskObjectModel existingTask = retrieveTask(id);
+            //task then retrieved via entity manager for java persistence tracking.
+            TaskEntity entity = entityManager.find(TaskEntity.class, id);
+            entityManager.remove(entity);
+        }catch (Exception e){
+            log.error("Error deleting task with id {}: {}",id, e.getMessage());
+            throw new RuntimeException("Unable to delete task with id " + id, e);
+        }
     }
 
-    public EntityManager getEntityManager() {
-        return entityManager;
-    }
+    public void validateTaskObjectModel(TaskObjectModel model) {
 
-    public TaskMapper getTaskMapper() {
-        return taskMapper;
-    }
+        if (model == null) {
+            throw new IllegalArgumentException("TaskObjectModel cannot be null");
+        }
 
-    public void setTaskMapper(TaskMapper taskMapper) {
-        this.taskMapper = taskMapper;
-    }
+        if (model.getTaskName() == null || model.getTaskName().isBlank()) {
+            throw new IllegalArgumentException("Task name cannot be null or blank");
+        }
 
-    public void setEntityManager(EntityManager entityManager) {
-        this.entityManager = entityManager;
+        if (model.getTaskType() == null || model.getTaskType().isBlank()) {
+            throw new IllegalArgumentException("Task type cannot be null or blank");
+        }
+
+        if (model.getTaskLevel() == null || model.getTaskLevel().isBlank()) {
+            throw new IllegalArgumentException("Task level cannot be null or blank");
+        }
+
+        if (model.getTaskOwnerId() == null || model.getTaskOwnerId().isBlank()) {
+            throw new IllegalArgumentException("Task owner ID cannot be null or blank");
+        }
     }
 }
