@@ -67,7 +67,6 @@ public class TaskManagementService {
             throw new PermissionDeniedException("User does not have permission to update this task");
         }
         this.adaptorService.updateTask(updateTaskRequestPackage);
-
     }
 
     public void deleteTask(long id,Authentication authentication){

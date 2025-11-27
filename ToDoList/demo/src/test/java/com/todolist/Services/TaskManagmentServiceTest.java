@@ -8,7 +8,11 @@ import io.micronaut.security.authentication.Authentication;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 @MicronautTest
+@ExtendWith(MockitoExtension.class)
 @DisplayName("TaskManagementService Authentication Tests")
 class TaskManagmentServiceTest {
 
@@ -36,7 +41,18 @@ class TaskManagmentServiceTest {
 
     java.util.List<TaskObjectModel> allInvalid;
 
+
+    @Mock
+    AdaptorService adaptorService;
+
+    @Mock
+    GameService gameService;
+
+    @Mock
     Authentication mockAuthentication;
+
+    @InjectMocks
+    TaskManagementService service;
 
 
     @BeforeEach
@@ -67,53 +83,45 @@ class TaskManagmentServiceTest {
                 invalidLevelNull, invalidLevelEmpty,
                 invalidDescNull, invalidDescEmpty
         );
+    }
+    @Test
+    @DisplayName("Create Task shows illegal state exception when authentication is null and doesnt create task")
+    void createTask_throwsIllegalState_whenAuthenticationIsNull() {
+        //Arrange
+        Authentication authentication = null;
+        TaskObjectModel taskObjectModel = this.valid;
 
-        // Authentication Examples
-        this.mockAuthentication =  Authentication.build("ETHAN",List.of("ADMIN","USER"));
+        //Assert
+        assertThrows(IllegalStateException.class, () -> service.createTask(taskObjectModel, authentication));
+        verifyNoInteractions(service.adaptorService);
     }
 
+    @DisplayName("Create task throws illegal state exception when task object model is null and test doesnt create task ")
     @Test
-    @DisplayName("Test createTask interacts with entity manager as expected")
+    void createTask_throwsIllegalState_whenTaskObjectModelIsNull() {
+        //Arrange
+        Authentication authentication = this.mockAuthentication;
+        TaskObjectModel taskObjectModel = null;
+
+        //Assert
+        assertThrows(IllegalStateException.class, () -> service.createTask(taskObjectModel, authentication));
+        verifyNoInteractions(service.adaptorService);
+
+    }
+
+
+    @DisplayName("Test createTask interacts with entity manager as expected when valid authentication and task model passed")
+    @Test
     void createTask() {
         //Arrange
-        TaskManagementService service = mock(TaskManagementService.class);
-        TaskObjectModel taskObjectModel = new TaskObjectModel();
-        taskObjectModel.setTaskName("Test Task");
-        taskObjectModel.setTaskType("Test Type");
-        taskObjectModel.setTaskDescription("Test Description");
-        taskObjectModel.setTaskLevel("Test Level");
+        TaskObjectModel taskObjectModel = valid;
+        when(mockAuthentication.getName()).thenReturn("ETHAN");
         //Act
 
         service.createTask(taskObjectModel, mockAuthentication);
         //Assert
-        Mockito.verify(service).createTask(taskObjectModel, mockAuthentication);
-        Mockito.verifyNoMoreInteractions(service);
-    }
-
-    @Test
-    @DisplayName("Test createTask validates task correctly")
-    void createTask_ValidatesTaskCorrectly() {
-        //Arrange
-        TaskManagementService service = spy(new TaskManagementService());
-        TaskObjectModel CorrecttaskObjectModel = new TaskObjectModel();
-        CorrecttaskObjectModel.setTaskName("Test Task");
-        CorrecttaskObjectModel.setTaskType("Test Type");
-        CorrecttaskObjectModel.setTaskDescription("Test Description");
-        CorrecttaskObjectModel.setTaskLevel("Test Level");
-
-        //Act and Assert
-        assertDoesNotThrow(() -> service.validateTaskObjectModel(CorrecttaskObjectModel,this.mockAuthentication));
-        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidNameNull,this.mockAuthentication));
-        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidNameEmpty,this.mockAuthentication));
-        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidTypeNull,this.mockAuthentication));
-        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidTypeEmpty,this.mockAuthentication));
-        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidLevelNull,this.mockAuthentication));
-        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidLevelEmpty,this.mockAuthentication));
-        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidDescNull,this.mockAuthentication));
-        assertThrows(IllegalArgumentException.class, () -> service.validateTaskObjectModel(invalidDescEmpty,this.mockAuthentication));
-
-        Mockito.verify(service,Mockito.atMost(9)).validateTaskObjectModel(CorrecttaskObjectModel,this.mockAuthentication);
-
+        Assertions.assertEquals("ETHAN",taskObjectModel.getTaskOwnerId());
+        Mockito.verify(adaptorService ,times(1)).createTask(taskObjectModel);
     }
 
     @Test
@@ -212,6 +220,8 @@ class TaskManagmentServiceTest {
         // Arrange
         TaskManagementService service = new TaskManagementService();
         AdaptorService adaptorService = mock(AdaptorService.class);
+        GameService gameService = mock(GameService.class);
+        service.gameService = gameService;
         service.adaptorService = adaptorService;
 
         long taskId = 1L;

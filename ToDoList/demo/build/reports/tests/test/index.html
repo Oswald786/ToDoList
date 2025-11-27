@@ -20,13 +20,13 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">41</div>
+<div class="counter">12</div>
 <p>tests</p>
 </div>
 </td>
 <td>
 <div class="infoBox" id="failures">
-<div class="counter">1</div>
+<div class="counter">6</div>
 <p>failures</p>
 </div>
 </td>
@@ -38,7 +38,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">4.011s</div>
+<div class="counter">1.283s</div>
 <p>duration</p>
 </div>
 </td>
@@ -48,7 +48,7 @@
 </td>
 <td>
 <div class="infoBox failures" id="successRate">
-<div class="percent">97%</div>
+<div class="percent">50%</div>
 <p>successful</p>
 </div>
 </td>
@@ -71,8 +71,28 @@
 <h2>Failed tests</h2>
 <ul class="linkList">
 <li>
-<a href="classes/com.todolist.auth.RegistrationServiceTest.html">RegistrationServiceTest</a>.
-<a href="classes/com.todolist.auth.RegistrationServiceTest.html#registerSucceeds()">User able to register</a>
+<a href="classes/com.todolist.Services.TaskManagmentServiceTest.html">TaskManagementService Authentication Tests</a>.
+<a href="classes/com.todolist.Services.TaskManagmentServiceTest.html#deleteTask()">Test updateTask throws error when entity not found</a>
+</li>
+<li>
+<a href="classes/com.todolist.Services.TaskManagmentServiceTest.html">TaskManagementService Authentication Tests</a>.
+<a href="classes/com.todolist.Services.TaskManagmentServiceTest.html#entityNotFoundWhenTryingToUpdateTask()">Test throws Error when entity not found</a>
+</li>
+<li>
+<a href="classes/com.todolist.Services.TaskManagmentServiceTest.html">TaskManagementService Authentication Tests</a>.
+<a href="classes/com.todolist.Services.TaskManagmentServiceTest.html#taskThrowsErrorWhenEntityManagerFailsToReturnAnything()">Task throws and logs error when nothing is returned</a>
+</li>
+<li>
+<a href="classes/com.todolist.Services.TaskManagmentServiceTest.html">TaskManagementService Authentication Tests</a>.
+<a href="classes/com.todolist.Services.TaskManagmentServiceTest.html#testThrowsErrorWhenFieldNotFound()">Test throws Error when field not found</a>
+</li>
+<li>
+<a href="classes/com.todolist.Services.TaskManagmentServiceTest.html">TaskManagementService Authentication Tests</a>.
+<a href="classes/com.todolist.Services.TaskManagmentServiceTest.html#testThrowsErrorWhenReplacementNotFound()">Test throws Error when replacement not found</a>
+</li>
+<li>
+<a href="classes/com.todolist.Services.TaskManagmentServiceTest.html">TaskManagementService Authentication Tests</a>.
+<a href="classes/com.todolist.Services.TaskManagmentServiceTest.html#testUpdateTaskUpdatesTaskNameCorrectly()">Test updateTask updates task name correctly</a>
 </li>
 </ul>
 </div>
@@ -91,44 +111,14 @@
 </thead>
 <tbody>
 <tr>
-<td class="success">
-<a href="packages/com.todolist.html">com.todolist</a>
-</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="success">
+<td class="failures">
 <a href="packages/com.todolist.Services.html">com.todolist.Services</a>
 </td>
-<td>11</td>
+<td>12</td>
+<td>6</td>
 <td>0</td>
-<td>0</td>
-<td>0.264s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="success">
-<a href="packages/com.todolist.adaptors.web.html">com.todolist.adaptors.web</a>
-</td>
-<td>14</td>
-<td>0</td>
-<td>0</td>
-<td>0.091s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="failures">
-<a href="packages/com.todolist.auth.html">com.todolist.auth</a>
-</td>
-<td>15</td>
-<td>1</td>
-<td>0</td>
-<td>3.656s</td>
-<td class="failures">93%</td>
+<td>1.283s</td>
+<td class="failures">50%</td>
 </tr>
 </tbody>
 </table>
@@ -148,94 +138,14 @@
 </thead>
 <tbody>
 <tr>
-<td class="success">
-<a href="classes/com.todolist.DemoTest.html">com.todolist.DemoTest</a>
-</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="success">
+<td class="failures">
 <a href="classes/com.todolist.Services.TaskManagmentServiceTest.html">com.todolist.Services.TaskManagmentServiceTest</a>
 </td>
-<td>11</td>
-<td>0</td>
-<td>0</td>
-<td>0.264s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="success">
-<a href="classes/com.todolist.adaptors.web.AdaptorServiceTest.html">com.todolist.adaptors.web.AdaptorServiceTest</a>
-</td>
-<td>10</td>
-<td>0</td>
-<td>0</td>
-<td>0.089s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="success">
-<a href="classes/com.todolist.adaptors.web.TaskMapperTest.html">com.todolist.adaptors.web.TaskMapperTest</a>
-</td>
-<td>2</td>
-<td>0</td>
-<td>0</td>
-<td>0.001s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="success">
-<a href="classes/com.todolist.adaptors.web.UserMapperTest.html">com.todolist.adaptors.web.UserMapperTest</a>
-</td>
-<td>2</td>
-<td>0</td>
-<td>0</td>
-<td>0.001s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="success">
-<a href="classes/com.todolist.auth.AuthAdaptorServiceTest.html">com.todolist.auth.AuthAdaptorServiceTest</a>
-</td>
+<td>12</td>
 <td>6</td>
 <td>0</td>
-<td>0</td>
-<td>0.057s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="success">
-<a href="classes/com.todolist.auth.JwtAuthenticationTest.html">com.todolist.auth.JwtAuthenticationTest</a>
-</td>
-<td>2</td>
-<td>0</td>
-<td>0</td>
-<td>0.835s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="success">
-<a href="classes/com.todolist.auth.PasswordHasherTest.html">com.todolist.auth.PasswordHasherTest</a>
-</td>
-<td>3</td>
-<td>0</td>
-<td>0</td>
-<td>0.392s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="failures">
-<a href="classes/com.todolist.auth.RegistrationServiceTest.html">com.todolist.auth.RegistrationServiceTest</a>
-</td>
-<td>4</td>
-<td>1</td>
-<td>0</td>
-<td>2.372s</td>
-<td class="failures">75%</td>
+<td>1.283s</td>
+<td class="failures">50%</td>
 </tr>
 </tbody>
 </table>
@@ -248,7 +158,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 8.14.2</a> at 19 Nov 2025, 20:11:51</p>
+<a href="https://www.gradle.org">Gradle 8.14.2</a> at 27 Nov 2025, 21:47:13</p>
 </div>
 </div>
 </body>

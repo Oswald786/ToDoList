@@ -1,6 +1,7 @@
 package com.todolist.auth;
 
 import com.todolist.Models.UserDetailsModel;
+import com.todolist.Services.GameService;
 import com.todolist.adaptors.persistence.Jpa.UserEntity;
 import com.todolist.adaptors.web.UserMapper;
 import com.todolist.adaptors.web.UserMapperImpl;
@@ -19,6 +20,7 @@ class RegistrationServiceTest {
     private AuthAdaptorService fakeauthAdaptorService;
 
     private final UserMapper userMapper = new UserMapperImpl();
+    private final GameService gameService = mock(GameService.class);
 
     @BeforeEach
     void setUp() {
@@ -28,6 +30,7 @@ class RegistrationServiceTest {
         registrationService.setPasswordHasher(passwordHasher);
         registrationService.setAuthAdaptorService(fakeauthAdaptorService);
         registrationService.setEntityManager(mock(EntityManager.class));
+        registrationService.gameService = gameService;
     }
 
     @Test
@@ -96,6 +99,7 @@ class RegistrationServiceTest {
         UserEntity userEntity = userMapper.toEntity(userDetailsModel);
         when(passwordHasher.hashPassword(anyString())).thenReturn("hashedPassword");
         when(registrationService.entityManager.find(eq(UserEntity.class), eq(userDetailsModel.getUsername()))).thenReturn(null);
+        doNothing().when(registrationService.gameService).createPlayerStatsProfile(any(UserDetailsModel.class));
 
         //act
         registrationService.register(userDetailsModel);
@@ -103,7 +107,6 @@ class RegistrationServiceTest {
         // Assert
         verify(passwordHasher).hashPassword("unHashedPassword");
         verify(registrationService.getAuthAdaptorService()).createUser(any(UserDetailsModel.class));
-
-
+        verify(registrationService.gameService,times(1)).createPlayerStatsProfile(any(UserDetailsModel.class));
     }
 }
