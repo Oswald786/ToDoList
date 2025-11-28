@@ -4,6 +4,7 @@ import com.todolist.Models.TaskObjectModel;
 import com.todolist.Models.UpdateTaskRequestPackage;
 import com.todolist.adaptors.persistence.Jpa.TaskEntity;
 import com.todolist.adaptors.web.AdaptorService;
+import com.todolist.exceptions.PermissionDeniedException;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.persistence.EntityManager;
@@ -84,6 +85,8 @@ class TaskManagmentServiceTest {
                 invalidDescNull, invalidDescEmpty
         );
     }
+
+    //Below is create Task method Testing
     @Test
     @DisplayName("Create Task shows illegal state exception when authentication is null and doesnt create task")
     void createTask_throwsIllegalState_whenAuthenticationIsNull() {
@@ -124,95 +127,100 @@ class TaskManagmentServiceTest {
         Mockito.verify(adaptorService ,times(1)).createTask(taskObjectModel);
     }
 
+    //Below is update Task method Testing
     @Test
-    @DisplayName("Test throws Error when entity not found")
-    void entityNotFoundWhenTryingToUpdateTask() {
+    @DisplayName("Update task will throw illegal state exception when authentication is null and task wont update")
+    void updateTask_throwsIllegalState_whenAuthenticationIsNull() {
         //Arrange
-        TaskManagementService service = new TaskManagementService();
-        service.adaptorService = new AdaptorService();
-        EntityManager entityManager = mock(EntityManager.class);
-        service.adaptorService.setEntityManager(entityManager);
+        Authentication authentication = null;
         UpdateTaskRequestPackage updateTaskRequestPackage = mock(UpdateTaskRequestPackage.class);
 
-
-        when(entityManager.find(eq(TaskEntity.class), anyLong())).thenReturn(null);
-
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            service.updateTask(updateTaskRequestPackage,this.mockAuthentication);
-        });
-
+        //Assert
+        assertThrows(IllegalStateException.class, () -> service.updateTask(updateTaskRequestPackage, authentication));
+        verifyNoInteractions(service.adaptorService);
     }
 
     @Test
-    @DisplayName("Test throws Error when field not found")
-    void testThrowsErrorWhenFieldNotFound() {
+    @DisplayName("UpdateTask will throw an IllegalStateException if the update request is null therefore the task fails to update.")
+    void updateTask_throwsIllegalState_whenUpdateTaskRequestPackageIsNull() {
         //Arrange
-        TaskManagementService service = new TaskManagementService();
-        service.adaptorService = new AdaptorService();
-        EntityManager entityManager = mock(EntityManager.class);
-        service.adaptorService.setEntityManager(entityManager);
-        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "taskName", null);
-        TaskEntity taskEntity = mock(TaskEntity.class);
+        Authentication authentication = this.mockAuthentication;
+        UpdateTaskRequestPackage updateTaskRequestPackage = null;
 
-
-        when(entityManager.find(eq(TaskEntity.class), anyLong())).thenReturn(taskEntity);
-
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            service.updateTask(req,this.mockAuthentication);
-        });
+        //Assert
+        assertThrows(IllegalStateException.class, () -> service.updateTask(updateTaskRequestPackage, authentication));
+        verifyNoInteractions(service.adaptorService);
     }
 
-
     @Test
-    @DisplayName("Test throws Error when replacement not found")
-    void testThrowsErrorWhenReplacementNotFound() {
+    @DisplayName("UpdateTask will throw an IllegalArgumentException if the target field or replacement value is null or blank.")
+    void updateTask_throwsIllegalArgumentException_whenUpdateTaskRequestPackageContainsNullOrBlankFields() {
         //Arrange
-        TaskManagementService service = new TaskManagementService();
-        service.adaptorService = new AdaptorService();
-        EntityManager entityManager = mock(EntityManager.class);
-        service.adaptorService.setEntityManager(entityManager);
-        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, null, "Task Type");
-        TaskEntity taskEntity = mock(TaskEntity.class);
+        Authentication authentication = this.mockAuthentication;
+        UpdateTaskRequestPackage updatePackage_ReplacementNull = new UpdateTaskRequestPackage(1L, null, "taskType");
+        UpdateTaskRequestPackage updatePackage_ReplacementBlank = new UpdateTaskRequestPackage(1L, "", "taskType");
+        UpdateTaskRequestPackage updatePackage_FieldNull = new UpdateTaskRequestPackage(1L, "New Value", null);
+        UpdateTaskRequestPackage updatePackage_FieldBlank = new UpdateTaskRequestPackage(1L, "New Value", "");
 
-
-        when(entityManager.find(eq(TaskEntity.class), anyLong())).thenReturn(taskEntity);
-
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            service.updateTask(req,this.mockAuthentication);
-        });
+        //Act and Assert
+        for (UpdateTaskRequestPackage updatePackage : List.of(updatePackage_ReplacementNull, updatePackage_ReplacementBlank, updatePackage_FieldNull, updatePackage_FieldBlank)) {
+            Assertions.assertThrows(IllegalArgumentException.class, () -> service.updateTask(updatePackage, authentication));
+        }
+        verifyNoInteractions(service.adaptorService);
 
     }
 
-
     @Test
-    @DisplayName("Test updateTask updates task name correctly")
-    void testUpdateTaskUpdatesTaskNameCorrectly() {
-        // Arrange
-        TaskManagementService service = new TaskManagementService();
-        AdaptorService adaptorService = mock(AdaptorService.class);
-        service.adaptorService = adaptorService;
+    @DisplayName("UpdateTask throws PermissionDeniedException when the authentication does not contain an allowed role and is not task owner")
+    void updateTask_throwsPermissionDeniedException_whenAuthenticationLacksAllowedRole() {
+        //Arrange
+        TaskObjectModel taskOwnedByUser = new TaskObjectModel(1L, "user123", "Test Task", "GENERAL", "LOW", "This is a sample task");
+        when(adaptorService.retrieveTask(1L)).thenReturn(taskOwnedByUser);
+        when(mockAuthentication.getRoles()).thenReturn(List.of("Invalid role"));
+        when(mockAuthentication.getName()).thenReturn("user123456");
+        UpdateTaskRequestPackage updateTaskRequestPackage = new UpdateTaskRequestPackage(1L, "New Value", "taskType");
 
-        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1, "Tidy Room", "taskName");
-
-        TaskObjectModel fakeTask = new TaskObjectModel();
-        fakeTask.setId(1L);
-        fakeTask.setTaskOwnerId("ETHAN");
-        fakeTask.setTaskName("Old Task");
-
-        when(adaptorService.retrieveTask(1L)).thenReturn(fakeTask);
-        doNothing().when(adaptorService).updateTask(req);
-
-        // Act
-        service.updateTask(req, this.mockAuthentication);
-
-        // Assert
+        //Act and Assert
+        Assertions.assertThrows(PermissionDeniedException.class,() -> service.updateTask(updateTaskRequestPackage, this.mockAuthentication));
         verify(adaptorService, times(1)).retrieveTask(1L);
-        verify(adaptorService, times(1)).updateTask(req);
-
+        verify(adaptorService, never()).updateTask(eq(updateTaskRequestPackage));
     }
+
+    @Test
+    @DisplayName("UpdateTask updates task when valid parameters and permissions are present")
+    void updateTask_Updates_Task_When_Valid_Parameters_And_Permissions_Are_Present() {
+        //Arrange
+        TaskObjectModel taskOwnedByUser = new TaskObjectModel(1L, "user123", "Test Task", "GENERAL", "LOW", "This is a sample task");
+        when(adaptorService.retrieveTask(1L)).thenReturn(taskOwnedByUser);
+        when(mockAuthentication.getRoles()).thenReturn(List.of("USER"));
+        when(mockAuthentication.getName()).thenReturn("user123");
+        UpdateTaskRequestPackage updateTaskRequestPackage = new UpdateTaskRequestPackage(1L, "New Value", "taskType");
+
+        //Act
+        service.updateTask(updateTaskRequestPackage, this.mockAuthentication);
+        //Assert
+        verify(adaptorService, times(1)).retrieveTask(1L);
+        verify(adaptorService, times(1)).updateTask(eq(updateTaskRequestPackage));
+        verify(adaptorService, never()).createTask(any());
+    }
+
+    //Delete Task method testing
+
+    @Test
+    @DisplayName("deleteTask throws IllegalStateException when authentication is null")
+    void delete_Task_throws_IllegalState_when_Authentication_Is_Null() {
+        // Arrange
+
+
+        //Act and Assert
+        assertThrows(IllegalStateException.class, () -> service.deleteTask(1L, null));
+    }
+
+    @Test
+    @DisplayName("deleteTask denies access when user is not owner and lacks allowed roles")
+
+    @Test
+    @DisplayName("deleteTask deletes task and awards XP when user has valid permissions")
 
     @Test
     @DisplayName("Test updateTask throws error when entity not found")
