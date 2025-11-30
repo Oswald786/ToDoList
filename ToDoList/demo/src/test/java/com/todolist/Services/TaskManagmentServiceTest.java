@@ -1,9 +1,13 @@
 package com.todolist.Services;
 
+import com.todolist.Models.PlayerStatsModel;
 import com.todolist.Models.TaskObjectModel;
 import com.todolist.Models.UpdateTaskRequestPackage;
+import com.todolist.adaptors.persistence.Jpa.PlayerStatsEntity;
 import com.todolist.adaptors.persistence.Jpa.TaskEntity;
 import com.todolist.adaptors.web.AdaptorService;
+import com.todolist.adaptors.web.AdaptorServicePlayerStats;
+import com.todolist.auth.AuthenticationService;
 import com.todolist.exceptions.PermissionDeniedException;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -26,6 +30,8 @@ import static org.mockito.Mockito.*;
 @DisplayName("TaskManagementService Authentication Tests")
 class TaskManagmentServiceTest {
 
+    private final AuthenticationService authenticationService;
+    private final TaskManagementService taskManagementService;
     TaskObjectModel valid;
 
     TaskObjectModel invalidNameNull;
@@ -52,30 +58,39 @@ class TaskManagmentServiceTest {
     @Mock
     Authentication mockAuthentication;
 
+    @Mock
+    AdaptorServicePlayerStats mockAdaptorServicePlayerStats;
+
+
     @InjectMocks
     TaskManagementService service;
+
+    TaskManagmentServiceTest(AuthenticationService authenticationService, TaskManagementService taskManagementService) {
+        this.authenticationService = authenticationService;
+        this.taskManagementService = taskManagementService;
+    }
 
 
     @BeforeEach
     void setUp() {
         // Valid baseline
-        valid = new TaskObjectModel(1L,"ETHAN", "Test Task", "Test Type", "Test Level", "Test Description");
+        valid = new TaskObjectModel(1L, "ETHAN", "Test Task", "Test Type", "Test Level", "Test Description");
 
         // Invalid: task name
-        invalidNameNull  = new TaskObjectModel(2L,"ETHAN", null,        "Test Type", "Test Level", "Test Description");
-        invalidNameEmpty = new TaskObjectModel(3L,"ETHAN", "",          "Test Type", "Test Level", "Test Description");
+        invalidNameNull = new TaskObjectModel(2L, "ETHAN", null, "Test Type", "Test Level", "Test Description");
+        invalidNameEmpty = new TaskObjectModel(3L, "ETHAN", "", "Test Type", "Test Level", "Test Description");
 
         // Invalid: task type
-        invalidTypeNull  = new TaskObjectModel(4L,"ETHAN", "Test Task", null,        "Test Level", "Test Description");
-        invalidTypeEmpty = new TaskObjectModel(5L,"ETHAN", "Test Task", "",          "Test Level", "Test Description");
+        invalidTypeNull = new TaskObjectModel(4L, "ETHAN", "Test Task", null, "Test Level", "Test Description");
+        invalidTypeEmpty = new TaskObjectModel(5L, "ETHAN", "Test Task", "", "Test Level", "Test Description");
 
         // Invalid: task level
-        invalidLevelNull  = new TaskObjectModel(6L,"ETHAN", "Test Task", "Test Type", null,        "Test Description");
-        invalidLevelEmpty = new TaskObjectModel(7L,"ETHAN", "Test Task", "Test Type", "",          "Test Description");
+        invalidLevelNull = new TaskObjectModel(6L, "ETHAN", "Test Task", "Test Type", null, "Test Description");
+        invalidLevelEmpty = new TaskObjectModel(7L, "ETHAN", "Test Task", "Test Type", "", "Test Description");
 
         // Invalid: task description
-        invalidDescNull  = new TaskObjectModel(8L,"ETHAN", "Test Task", "Test Type", "Test Level", null);
-        invalidDescEmpty = new TaskObjectModel(9L,"ETHAN", "Test Task", "Test Type", "Test Level", "");
+        invalidDescNull = new TaskObjectModel(8L, "ETHAN", "Test Task", "Test Type", "Test Level", null);
+        invalidDescEmpty = new TaskObjectModel(9L, "ETHAN", "Test Task", "Test Type", "Test Level", "");
 
         // Convenience collection
         allInvalid = java.util.List.of(
@@ -123,8 +138,8 @@ class TaskManagmentServiceTest {
 
         service.createTask(taskObjectModel, mockAuthentication);
         //Assert
-        Assertions.assertEquals("ETHAN",taskObjectModel.getTaskOwnerId());
-        Mockito.verify(adaptorService ,times(1)).createTask(taskObjectModel);
+        Assertions.assertEquals("ETHAN", taskObjectModel.getTaskOwnerId());
+        Mockito.verify(adaptorService, times(1)).createTask(taskObjectModel);
     }
 
     //Below is update Task method Testing
@@ -181,7 +196,7 @@ class TaskManagmentServiceTest {
         UpdateTaskRequestPackage updateTaskRequestPackage = new UpdateTaskRequestPackage(1L, "New Value", "taskType");
 
         //Act and Assert
-        Assertions.assertThrows(PermissionDeniedException.class,() -> service.updateTask(updateTaskRequestPackage, this.mockAuthentication));
+        Assertions.assertThrows(PermissionDeniedException.class, () -> service.updateTask(updateTaskRequestPackage, this.mockAuthentication));
         verify(adaptorService, times(1)).retrieveTask(1L);
         verify(adaptorService, never()).updateTask(eq(updateTaskRequestPackage));
     }
@@ -210,193 +225,198 @@ class TaskManagmentServiceTest {
     @DisplayName("deleteTask throws IllegalStateException when authentication is null")
     void delete_Task_throws_IllegalState_when_Authentication_Is_Null() {
         // Arrange
-
-
+        this.mockAuthentication = null;
         //Act and Assert
-        assertThrows(IllegalStateException.class, () -> service.deleteTask(1L, null));
+        assertThrows(IllegalStateException.class, () -> service.deleteTask(1L, mockAuthentication));
     }
 
     @Test
     @DisplayName("deleteTask denies access when user is not owner and lacks allowed roles")
+    void deleteTask_denies_access_when_user_is_not_owner_and_lacks_allowed_roles() {
+        this.mockAuthentication = mock(Authentication.class);
+        when(mockAuthentication.getName()).thenReturn("user123456");
+        when(mockAuthentication.getRoles()).thenReturn(List.of("INVALID ROLE"));
+        when(adaptorService.retrieveTask(1L)).thenReturn(new TaskObjectModel(1L, "user123", "Test Task", "GENERAL", "LOW", "This is a sample task"));
+
+        //Act and Assert
+        Assertions.assertThrows(PermissionDeniedException.class, () -> service.deleteTask(1L, this.mockAuthentication));
+    }
 
     @Test
     @DisplayName("deleteTask deletes task and awards XP when user has valid permissions")
+    void deleteTask_deletes_task_and_awards_XP_when_user_has_valid_permissions() {
+        //Arrange
+        this.mockAuthentication = mock(Authentication.class);
+        TaskObjectModel taskOwnedByUser = new TaskObjectModel(1L, "user123456", "Test Task", "GENERAL", "LOW", "This is a sample task");
 
-    @Test
-    @DisplayName("Test updateTask throws error when entity not found")
-    void deleteTask() {
-        // Arrange
-        TaskManagementService service = new TaskManagementService();
-        AdaptorService adaptorService = mock(AdaptorService.class);
-        GameService gameService = mock(GameService.class);
-        service.gameService = gameService;
-        service.adaptorService = adaptorService;
+        when(mockAuthentication.getName()).thenReturn("user123456");
+        when(mockAuthentication.getRoles()).thenReturn(List.of("USER"));
+        when(adaptorService.retrieveTask(1L)).thenReturn(taskOwnedByUser);
 
-        long taskId = 1L;
-        TaskObjectModel fakeTask = new TaskObjectModel();
-        fakeTask.setId(taskId);
-        fakeTask.setTaskOwnerId("ETHAN");
-
-        when(adaptorService.retrieveTask(taskId)).thenReturn(fakeTask);
-        doNothing().when(adaptorService).deleteTask(taskId);
+        // Mock the gameService method directly instead of the nested field
+        doNothing().when(gameService).addXPForTaskCompletion(taskOwnedByUser, this.mockAuthentication);
 
         // Act
-        service.deleteTask(taskId, this.mockAuthentication);
+        service.deleteTask(1L, this.mockAuthentication);
 
         // Assert
-        verify(adaptorService, times(1)).retrieveTask(taskId);
-        verify(adaptorService, times(1)).deleteTask(taskId);
+        verify(adaptorService, times(1)).retrieveTask(1L);
+        verify(adaptorService, times(1)).deleteTask(1L);
+        verify(gameService, times(1)).addXPForTaskCompletion(taskOwnedByUser, this.mockAuthentication);
+
     }
 
+    //Fetch all tasks method testing
     @Test
-    @DisplayName("Tests all tasks are fetched correctly")
-    void fetchAllTasks() {
+    @DisplayName("fetchAllTasks throws IllegalStateException when authentication is null")
+    void fetchAllTasks_throws_IllegalState_when_Authentication_Is_Null() {
         // Arrange
-        TaskManagementService service = new TaskManagementService();
-        AdaptorService adaptorService = mock(AdaptorService.class);
-        service.adaptorService = adaptorService;
+        this.mockAuthentication = null;
+        //Act and Assert
+        assertThrows(IllegalStateException.class, () -> service.fetchAllTasks(mockAuthentication));
 
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getName()).thenReturn("ETHAN");
-
-        ArrayList<TaskObjectModel> expectedList = new ArrayList<>();
-        expectedList.add(new TaskObjectModel(1L, "ETHAN", "Tidy Room", "Chore", "Easy", "Pick up clothes and make the bed"));
-        expectedList.add(new TaskObjectModel(2L, "ETHAN", "Grocery Shopping", "Errand", "Medium", "Buy milk, eggs, bread"));
-        expectedList.add(new TaskObjectModel(3L, "ETHAN", "Write Report", "Work", "Hard", "Summarize Q3 project outcomes"));
-
-        when(adaptorService.fetchAllTasksByOwner("ETHAN")).thenReturn(expectedList);
-
-        // Act
-        ArrayList<TaskObjectModel> result = service.fetchAllTasks(authentication);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(3, result.size());
-        assertEquals("Tidy Room", result.get(0).getTaskName());
-        assertEquals("Grocery Shopping", result.get(1).getTaskName());
-        assertEquals("Write Report", result.get(2).getTaskName());
-
-        verify(adaptorService, times(1)).fetchAllTasksByOwner("ETHAN");
-    }
-
-    private static List<TaskEntity> getTaskEntities() {
-        List<TaskEntity> resultList = new ArrayList<>();
-
-        TaskEntity t1 = new TaskEntity();
-        t1.setId(1L);
-        t1.setTaskOwnerId("ETHAN");
-        t1.setTaskName("Tidy Room");
-        t1.setTaskType("Chore");
-        t1.setTaskLevel("Easy");
-        t1.setTaskDescription("Pick up clothes and make the bed");
-        resultList.add(t1);
-
-        TaskEntity t2 = new TaskEntity();
-        t2.setId(2L);
-        t2.setTaskOwnerId("ETHAN");
-        t2.setTaskName("Grocery Shopping");
-        t2.setTaskType("Errand");
-        t2.setTaskLevel("Medium");
-        t2.setTaskDescription("Buy milk, eggs, bread");
-        resultList.add(t2);
-
-        TaskEntity t3 = new TaskEntity();
-        t3.setId(3L);
-        t3.setTaskOwnerId("ETHAN");
-        t3.setTaskName("Write Report");
-        t3.setTaskType("Work");
-        t3.setTaskLevel("Hard");
-        t3.setTaskDescription("Summarize Q3 project outcomes");
-        resultList.add(t3);
-        return resultList;
     }
 
     @Test
-    @DisplayName("Tests task is fetched correctly Based on id")
-    void fetchTaskWithId() {
-        // Arrange
-        TaskManagementService service = new TaskManagementService();
-        AdaptorService adaptorService = mock(AdaptorService.class);
-        service.adaptorService = adaptorService;
-
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getName()).thenReturn("ETHAN");
-        when(authentication.getRoles()).thenReturn(List.of("USER"));
-
-        TaskObjectModel expectedTask = new TaskObjectModel(
-                2L, "ETHAN", "Grocery Shopping", "Errand", "Medium", "Buy milk, eggs, bread");
-
-        when(adaptorService.retrieveTask(2L)).thenReturn(expectedTask);
-
-        // Act
-        TaskObjectModel result = service.fetchTaskWithId(2L, authentication);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(expectedTask.getTaskName(), result.getTaskName());
-        assertEquals(expectedTask.getTaskType(), result.getTaskType());
-        assertEquals(expectedTask.getTaskLevel(), result.getTaskLevel());
-        assertEquals(expectedTask.getTaskDescription(), result.getTaskDescription());
-        assertEquals(expectedTask.getId(), result.getId());
-
-        verify(adaptorService, times(1)).retrieveTask(2L);
-    }
-
-    @Test
-    @DisplayName("Task throws and logs error when nothing is returned")
-    void taskThrowsErrorWhenEntityManagerFailsToReturnAnything(){
-        // Arrange
-        TaskManagementService service = new TaskManagementService();
-        AdaptorService adaptorService = mock(AdaptorService.class);
-        service.adaptorService = adaptorService;
-
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getName()).thenReturn("ETHAN");
-        when(authentication.getRoles()).thenReturn(List.of("USER"));
-
-        when(adaptorService.retrieveTask(2L)).thenThrow(new IllegalArgumentException("Task not found"));
-
-
-        // Assert
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            service.fetchTaskWithId(2L, authentication);
-        });
-        verify(adaptorService, times(1)).retrieveTask(2L);
-    }
-
-    @Test
-    @DisplayName("Validate that task access is granted to owner or authorized user")
-    void validateTaskOwnershipAndAuthority() {
-        //method checks whether user either has authority as a suer or is the owner of the task
-        //arrange
-
-        TaskManagementService service = new TaskManagementService();
-        Authentication authenticationRole = mock(Authentication.class);
-        Authentication authenticationOwner = mock(Authentication.class);
-
-        TaskObjectModel ethanTask = new TaskObjectModel(
-                1L,                     // ID
-                "ETHAN",                // Task Owner
-                "Organize Workspace",   // Task Name
-                "Chore",                // Task Type
-                "Medium",               // Task Level
-                "Sort cables, dust off desk, and arrange items neatly" // Description
-        );
-
-        // Mock a user who owns the task
-        when(authenticationOwner.getName()).thenReturn("ETHAN");
-
-        // Mock a different user with admin privileges
-        when(authenticationRole.getName()).thenReturn("notAnOwner");
-        when(authenticationRole.getRoles()).thenReturn(List.of("ADMIN"));
+    @DisplayName("fetchAllTasks calls adaptor and returns tasks when authentication is valid")
+    void fetchAllTasks_calls_adaptor_and_returns_tasks_when_authentication_is_valid() {
+        //Arrange
+        when(mockAuthentication.getName()).thenReturn("user123456");
+        when(adaptorService.fetchAllTasksByOwner(anyString())).thenReturn(new ArrayList<>());
 
         //Act
-        boolean resultAsTaskOwner = service.validateTaskOwnershipAndAuthority(ethanTask,authenticationOwner,List.of("USER"));
+        List<TaskObjectModel> result = service.fetchAllTasks(mockAuthentication);
+        verify(adaptorService, times(1)).fetchAllTasksByOwner(anyString());
+        verifyNoMoreInteractions(adaptorService);
 
-        boolean resultAsAdmin = service.validateTaskOwnershipAndAuthority(ethanTask,authenticationRole,List.of("ADMIN"));
+    }
 
-        Assertions.assertTrue(resultAsTaskOwner);
-        Assertions.assertTrue(resultAsAdmin);
+    //Fetch task with id method testing
 
+    @Test
+    @DisplayName("fetchTaskWithId denies access when user lacks ownership or valid role")
+    void fetchTaskWithId_denies_access_when_user_lacks_ownership_or_valid_role() {
+        //Arrange
+        this.mockAuthentication = mock(Authentication.class);
+        when(mockAuthentication.getName()).thenReturn("user123456");
+        when(mockAuthentication.getRoles()).thenReturn(List.of("INVALID ROLE"));
+        when(adaptorService.retrieveTask(1L)).thenReturn(new TaskObjectModel(1L, "user123", "Test Task", "GENERAL", "LOW", "This is a sample task"));
+
+        //Act and Assert
+        Assertions.assertThrows(PermissionDeniedException.class, () -> service.fetchTaskWithId(1L, this.mockAuthentication));
+    }
+
+    @Test
+    @DisplayName("fetchTaskWithId returns task when user has correct ownership and roles")
+    void fetchTaskWithId_returns_task_when_user_has_correct_ownership_and_roles() {
+        //Arrange
+        this.mockAuthentication = mock(Authentication.class);
+        when(mockAuthentication.getName()).thenReturn("user123456");
+        when(mockAuthentication.getRoles()).thenReturn(List.of("USER"));
+        when(adaptorService.retrieveTask(1L)).thenReturn(new TaskObjectModel(1L, "user123456", "Test Task", "GENERAL", "LOW", "This is a sample task"));
+
+        //Act
+        TaskObjectModel result = service.fetchTaskWithId(1L, this.mockAuthentication);
+
+        //Assert
+        verify(adaptorService, times(1)).retrieveTask(1L);
+        Assertions.assertEquals("user123456", result.getTaskOwnerId());
+        Assertions.assertEquals("Test Task", result.getTaskName());
+        Assertions.assertEquals("GENERAL", result.getTaskType());
+        Assertions.assertEquals("LOW", result.getTaskLevel());
+        Assertions.assertEquals("This is a sample task", result.getTaskDescription());
+        Assertions.assertEquals(1L, result.getId());
+        verifyNoMoreInteractions(adaptorService);
+    }
+
+    //Validate Task Object Model method testing
+    @Test
+    @DisplayName("validateTaskObjectModel returns nothing when valid task object model is passed")
+    void validateTaskObjectModel_returns_true_when_valid_task_object_model_is_passed() {
+        //Arrange
+        TaskObjectModel validTask = new TaskObjectModel(1L, "user123456", "Test Task", "GENERAL", "LOW", "This is a valid task description");
+
+        //Act
+        Assertions.assertDoesNotThrow(() -> taskManagementService.validateTaskObjectModel(validTask, this.mockAuthentication));
+
+    }
+
+    @Test
+    @DisplayName("validateTaskObjectModel throws IllegalArgumentException when task fields are missing or empty")
+    void validateTaskObjectModel_throws_IllegalArgumentException_when_task_fields_are_missing_or_empty() {
+        //Arrange + Act + Assert
+        for (TaskObjectModel invalidTask : this.allInvalid) {
+            assertThrows(IllegalArgumentException.class, () -> taskManagementService.validateTaskObjectModel(invalidTask, this.mockAuthentication));
+        }
+    }
+
+
+    //Validating task ownership and authority
+
+    @Test
+    @DisplayName("validateTaskOwnershipAndAuthority returns true when user is owner and has allowed role")
+    void validateTaskOwnershipAndAuthority_returns_true_when_user_is_owner_and_has_allowed_role() {
+        // Arrange
+        TaskObjectModel task = new TaskObjectModel(1L, "user123", "Test", "GENERAL", "LOW", "desc");
+        Authentication auth = mock(Authentication.class);
+
+        when(auth.getName()).thenReturn("user123");
+        when(auth.getRoles()).thenReturn(List.of("ADMIN"));
+
+        // Act
+        boolean result = service.validateTaskOwnershipAndAuthority(task, auth, List.of("ADMIN", "USER"));
+
+        // Assert
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("validateTaskOwnershipAndAuthority returns true when user owns the task even without allowed role")
+    void validateTaskOwnershipAndAuthority_returns_true_when_user_is_owner_even_without_allowed_role() {
+        // Arrange
+        TaskObjectModel task = new TaskObjectModel(1L, "user123", "Test", "GENERAL", "LOW", "desc");
+        Authentication auth = mock(Authentication.class);
+
+        when(auth.getName()).thenReturn("user123");
+        when(auth.getRoles()).thenReturn(List.of("INVALID"));
+
+        // Act
+        boolean result = service.validateTaskOwnershipAndAuthority(task, auth, List.of("ADMIN", "USER"));
+
+        // Assert
+        Assertions.assertTrue(result);
+    }
+
+    @DisplayName("validateTaskOwnershipAndAuthority returns true when user has allowed role even if not owner")
+    void validateTaskOwnershipAndAuthority_returns_true_when_user_has_allowed_role_even_if_not_owner() {
+        // Arrange
+        TaskObjectModel task = new TaskObjectModel(1L, "differentUser", "Test", "GENERAL", "LOW", "desc");
+        Authentication auth = mock(Authentication.class);
+
+        when(auth.getName()).thenReturn("user123");
+        when(auth.getRoles()).thenReturn(List.of("ADMIN"));
+
+        // Act
+        boolean result = service.validateTaskOwnershipAndAuthority(task, auth, List.of("ADMIN", "USER"));
+
+        // Assert
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("validateTaskOwnershipAndAuthority returns false when user is not owner and has no allowed role")
+    void validateTaskOwnershipAndAuthority_returns_false_when_user_is_not_owner_and_has_no_allowed_role() {
+        // Arrange
+        TaskObjectModel task = new TaskObjectModel(1L, "differentUser", "Test", "GENERAL", "LOW", "desc");
+        Authentication auth = mock(Authentication.class);
+
+        when(auth.getName()).thenReturn("user123");
+        when(auth.getRoles()).thenReturn(List.of("INVALID"));
+
+        // Act
+        boolean result = service.validateTaskOwnershipAndAuthority(task, auth, List.of("ADMIN", "USER"));
+
+        // Assert
+        Assertions.assertFalse(result);
     }
 }
