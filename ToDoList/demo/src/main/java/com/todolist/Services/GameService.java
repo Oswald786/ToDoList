@@ -31,7 +31,10 @@ public class GameService {
 
     //add a new player stats profile if not exists
     public void createPlayerStatsProfile(UserDetailsModel userDetailsModel) {
-        if (userDetailsModel == null || userDetailsModel.getUsername() == null || userDetailsModel.getUsername().isBlank()){
+        if (userDetailsModel == null){
+            throw new IllegalArgumentException("User details model cannot be null");
+        }
+        if (userDetailsModel.getUsername() == null || userDetailsModel.getUsername().isBlank()){
             throw new PlayerUsernameNotProvided("Player username cannot be null or blank");
         }
         PlayerStatsModel playerStatsModel = new PlayerStatsModel();
@@ -146,5 +149,5 @@ public class GameService {
        }else if(playerStatsModel.getPlayerUsername() == null || playerStatsModel.getPlayerUsername().isEmpty()){
            throw new MapperFailedException("Mapper failed to map player stats to model at " + ErrorLocation + ".");
        }
-       }
+    }
 }
