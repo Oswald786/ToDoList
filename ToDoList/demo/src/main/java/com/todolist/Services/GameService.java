@@ -118,13 +118,6 @@ public class GameService {
         return playerStatsModel.getPlayerLevel() * 20;
     }
 
-    //Calculate XP needed to level up
-    public int calculateXPToLevelUp(Authentication authentication){
-        validatePlayerAuthentication(authentication,"CalculateXPToLevelUp method");
-        PlayerStatsEntity entityReturned = adaptorServicePlayerStats.retrievePlayerStats(authentication);
-        return entityReturned.getXpToNextLevel() - entityReturned.getPlayerXp();
-    }
-
 
     //Grant level reward (Optional)
 
