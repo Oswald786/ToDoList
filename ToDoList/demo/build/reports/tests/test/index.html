@@ -20,13 +20,13 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">71</div>
+<div class="counter">89</div>
 <p>tests</p>
 </div>
 </td>
 <td>
 <div class="infoBox" id="failures">
-<div class="counter">0</div>
+<div class="counter">6</div>
 <p>failures</p>
 </div>
 </td>
@@ -38,7 +38,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">3.573s</div>
+<div class="counter">4.532s</div>
 <p>duration</p>
 </div>
 </td>
@@ -47,8 +47,8 @@
 </div>
 </td>
 <td>
-<div class="infoBox success" id="successRate">
-<div class="percent">100%</div>
+<div class="infoBox failures" id="successRate">
+<div class="percent">93%</div>
 <p>successful</p>
 </div>
 </td>
@@ -58,12 +58,44 @@
 <div class="tab-container">
 <ul class="tabLinks">
 <li>
+<a href="#">Failed tests</a>
+</li>
+<li>
 <a href="#">Packages</a>
 </li>
 <li>
 <a href="#">Classes</a>
 </li>
 </ul>
+<div class="tab">
+<h2>Failed tests</h2>
+<ul class="linkList">
+<li>
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html">AdaptorServicePlayerStatsTest</a>.
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html#createPlayerStats_throws_whenLevelInvalid()">Throws when player level is less than 1</a>
+</li>
+<li>
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html">AdaptorServicePlayerStatsTest</a>.
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html#createPlayerStats_throws_whenModelNull()">Throws when player stats model is null</a>
+</li>
+<li>
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html">AdaptorServicePlayerStatsTest</a>.
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html#createPlayerStats_throws_whenUsernameBlank()">Throws when username is blank</a>
+</li>
+<li>
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html">AdaptorServicePlayerStatsTest</a>.
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html#createPlayerStats_throws_whenUsernameNull()">Throws when username is null</a>
+</li>
+<li>
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html">AdaptorServicePlayerStatsTest</a>.
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html#createPlayerStats_throws_whenXpNegative()">Throws when XP is negative</a>
+</li>
+<li>
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html">AdaptorServicePlayerStatsTest</a>.
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html#createPlayerStats_throws_whenXpToNextLevelInvalid()">Throws when XP to next level is zero or negative</a>
+</li>
+</ul>
+</div>
 <div class="tab">
 <h2>Packages</h2>
 <table>
@@ -85,7 +117,7 @@
 <td>1</td>
 <td>0</td>
 <td>0</td>
-<td>0.044s</td>
+<td>0.040s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -95,27 +127,27 @@
 <td>41</td>
 <td>0</td>
 <td>0</td>
-<td>1.222s</td>
+<td>1.434s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
-<td class="success">
+<td class="failures">
 <a href="packages/com.todolist.adaptors.web.html">com.todolist.adaptors.web</a>
 </td>
-<td>14</td>
+<td>22</td>
+<td>6</td>
 <td>0</td>
-<td>0</td>
-<td>0.228s</td>
-<td class="success">100%</td>
+<td>0.296s</td>
+<td class="failures">72%</td>
 </tr>
 <tr>
 <td class="success">
 <a href="packages/com.todolist.auth.html">com.todolist.auth</a>
 </td>
-<td>15</td>
+<td>25</td>
 <td>0</td>
 <td>0</td>
-<td>2.079s</td>
+<td>2.762s</td>
 <td class="success">100%</td>
 </tr>
 </tbody>
@@ -142,7 +174,7 @@
 <td>1</td>
 <td>0</td>
 <td>0</td>
-<td>0.044s</td>
+<td>0.040s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -152,7 +184,7 @@
 <td>21</td>
 <td>0</td>
 <td>0</td>
-<td>0.970s</td>
+<td>1.133s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -162,8 +194,18 @@
 <td>20</td>
 <td>0</td>
 <td>0</td>
-<td>0.252s</td>
+<td>0.301s</td>
 <td class="success">100%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html">com.todolist.adaptors.web.AdaptorServicePlayerStatsTest</a>
+</td>
+<td>6</td>
+<td>6</td>
+<td>0</td>
+<td>0.034s</td>
+<td class="failures">0%</td>
 </tr>
 <tr>
 <td class="success">
@@ -172,7 +214,17 @@
 <td>10</td>
 <td>0</td>
 <td>0</td>
-<td>0.228s</td>
+<td>0.259s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.adaptors.web.PlayerStatsMapperTest.html">com.todolist.adaptors.web.PlayerStatsMapperTest</a>
+</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0.001s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -182,7 +234,7 @@
 <td>2</td>
 <td>0</td>
 <td>0</td>
-<td>0s</td>
+<td>0.001s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -192,7 +244,7 @@
 <td>2</td>
 <td>0</td>
 <td>0</td>
-<td>0s</td>
+<td>0.001s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -202,27 +254,27 @@
 <td>6</td>
 <td>0</td>
 <td>0</td>
-<td>0.090s</td>
+<td>0.103s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
 <td class="success">
 <a href="classes/com.todolist.auth.JwtAuthenticationTest.html">com.todolist.auth.JwtAuthenticationTest</a>
 </td>
-<td>2</td>
+<td>6</td>
 <td>0</td>
 <td>0</td>
-<td>1.597s</td>
+<td>2.177s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
 <td class="success">
 <a href="classes/com.todolist.auth.PasswordHasherTest.html">com.todolist.auth.PasswordHasherTest</a>
 </td>
-<td>3</td>
+<td>9</td>
 <td>0</td>
 <td>0</td>
-<td>0.322s</td>
+<td>0.408s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -232,7 +284,7 @@
 <td>4</td>
 <td>0</td>
 <td>0</td>
-<td>0.070s</td>
+<td>0.074s</td>
 <td class="success">100%</td>
 </tr>
 </tbody>
@@ -246,7 +298,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 8.14.2</a> at 3 Dec 2025, 18:54:31</p>
+<a href="https://www.gradle.org">Gradle 8.14.2</a> at 4 Dec 2025, 02:07:54</p>
 </div>
 </div>
 </body>

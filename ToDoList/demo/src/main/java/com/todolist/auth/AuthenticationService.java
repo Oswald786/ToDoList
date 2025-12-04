@@ -48,12 +48,6 @@ public class AuthenticationService<B> implements HttpRequestAuthenticationProvid
                 String username = authRequest.getIdentity();
                 String password = authRequest.getSecret();
                 log.info("Extracted username: {} and password", username);
-                //Find the user based on the username provided
-                if (username == null || username.isBlank()) {
-                    throw new IllegalArgumentException("Username cannot be null or blank");
-                } else if (password == null || password.isBlank()) {
-                    throw new IllegalArgumentException("Password cannot be null or blank");
-                }
                 UserDetailsModel user = authAdaptorService.findUser(username);
                 log.info("Found user with username: {}", username);
 
@@ -62,14 +56,15 @@ public class AuthenticationService<B> implements HttpRequestAuthenticationProvid
                     //If the password matches, then return a success response
                     log.info("Authenticating user success");
                     return AuthenticationResponse.success(username, List.of(user.getRole()));
-                } else {
+                } else if (!passwordHasher.checkPassword(password, user.getPassword())){
                     //If the password does not match, then return a failure response
                     log.error("Authenticating user failure");
-                    return AuthenticationResponse.failure();
+                    return AuthenticationResponse.failure("Invalid credentials");
                 }
+                return AuthenticationResponse.failure("Invalid credentials");
             }catch (UserNotFoundException e){
                 log.error("User not found");
-                return AuthenticationResponse.failure();
+                return AuthenticationResponse.failure("Invalid credentials");
             }
     }
 }

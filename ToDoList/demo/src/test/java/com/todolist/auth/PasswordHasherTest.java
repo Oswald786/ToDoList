@@ -10,6 +10,26 @@ class PasswordHasherTest {
     PasswordHasher passwordHasher = new PasswordHasher();
 
     @Test
+    @DisplayName("Throws illegal argument exception when apssword is null or empty")
+    void hashPassword_throws_When_Password_Null() {
+        //Arrange
+        String rawPassword = "";
+
+        //Act + Assert
+        assertThrows(IllegalArgumentException.class, () -> passwordHasher.hashPassword(rawPassword));
+    }
+
+    @Test
+    @DisplayName("Throws illegal argument exception when password is empty")
+    void hashPassword_throws_When_Password_Empty() {
+        //Arrange
+        String rawPassword = "";
+
+        //Act + Assert
+        assertThrows(IllegalArgumentException.class, () -> passwordHasher.hashPassword(rawPassword));
+    }
+
+    @Test
     @DisplayName("hashPassword should return a non-null, non-equal hashed string")
     void hashPassword() {
         // Arrange
@@ -53,4 +73,49 @@ class PasswordHasherTest {
         // Assert
         assertFalse(result, "PasswordHasher should return false for incorrect passwords");
     }
+
+    @Test
+    @DisplayName("Throws illegal argument exception when checking password if password null")
+    void checkPassword_throws_When_Password_Null() {
+        //Arrange
+        String rawPassword = null;
+        String hashedPassword = "fakehashedpassword";
+
+        //Act + Assert
+        assertThrows(IllegalArgumentException.class, () -> passwordHasher.checkPassword(rawPassword, hashedPassword));
+    }
+
+    @Test
+    @DisplayName("Throws illegal argument exception when checking password if password null")
+    void checkPassword_throws_When_Password_Empty() {
+        //Arrange
+        String rawPassword = "";
+        String hashedPassword = "fakehashedpassword";
+
+        //Act + Assert
+        assertThrows(IllegalArgumentException.class, () -> passwordHasher.checkPassword(rawPassword, hashedPassword));
+    }
+
+    @Test
+    @DisplayName("Throws illegal argument exception when checking password if hashed password empty")
+    void checkPassword_throws_When_Hashed_Password_Empty() {
+        //Arrange
+        String rawPassword = "fakepassword";
+        String hashedPassword = "";
+
+        //Act + Assert
+        assertThrows(IllegalArgumentException.class, () -> passwordHasher.checkPassword(rawPassword, hashedPassword));
+    }
+
+    @Test
+    @DisplayName("Throws illegal argument exception when checking password if hashed password null")
+    void checkPassword_throws_When_Hashed_Password_Null() {
+        //Arrange
+        String rawPassword = "fakepassword";
+        String hashedPassword = null;
+
+        //Act + Assert
+        assertThrows(IllegalArgumentException.class, () -> passwordHasher.checkPassword(rawPassword, hashedPassword));
+    }
+
 }
