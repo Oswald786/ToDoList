@@ -18,6 +18,8 @@ import static org.mockito.Mockito.*;
 
 class AuthAdaptorServiceTest {
 
+    //needs more testing to achieve line coverage greater than 80%
+
     private AuthAdaptorService authAdaptorService;
     private EntityManager entityManager;
     private UserMapper userMapper;

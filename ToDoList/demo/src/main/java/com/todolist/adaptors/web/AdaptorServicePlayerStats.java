@@ -76,7 +76,7 @@ public class AdaptorServicePlayerStats {
     // --- DELETE ---
     @Transactional
     public void deletePlayerStats(Authentication authentication) {
-        validatePlayerAuthentication(authentication);
+            validatePlayerAuthentication(authentication);
             PlayerStatsEntity entity = retrievePlayerStats(authentication);
             if (entity != null) {
                 entityManager.remove(entity);
@@ -105,6 +105,8 @@ public class AdaptorServicePlayerStats {
             throw new PermissionDeniedException("Authentication name cannot be null or blank");
         }
     }
+
+
 
 
 }
