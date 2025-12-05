@@ -1,7 +1,7 @@
 package com.todolist.Controllers;
 
 
-import com.todolist.Models.userDetailsModel;
+import com.todolist.Models.UserDetailsModel;
 import com.todolist.auth.RegistrationService;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
@@ -19,14 +19,14 @@ public class AuthController {
     @Inject
     RegistrationService registrationService;
 
-    private Logger log = LoggerFactory.getLogger(AuthController.class);
+    private final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     @Secured(SecurityRule.IS_ANONYMOUS)
     @Post("/register")
-    public void register(@Body  userDetailsModel userDetailsModel){
+    public void register(@Body UserDetailsModel userDetailsModel){
         System.out.println("Registering user");
         //checkers to ensure the user is valid
-        if (userDetailsModel.getUserName() == null || userDetailsModel.getUserName().isBlank()){
+        if (userDetailsModel.getUsername() == null || userDetailsModel.getUsername().isBlank()){
             throw new IllegalArgumentException("Username cannot be null or blank");
         }else if(userDetailsModel.getPassword() == null || userDetailsModel.getPassword().isBlank()){
             throw new IllegalArgumentException("Password cannot be null or blank");
@@ -35,44 +35,6 @@ public class AuthController {
         }
 
         registrationService.register(userDetailsModel);
-
-
-        //turn the data object model into an entity
-
-        //persist the entity into the table
-
-        //give confirmation
     }
-
-//    @Post("/login")
-//    public AuthenticationResponse login(@Body HttpRequest<?> request){
-//        //attempt to log in using authentication service
-//        try{
-//            LoginRequestModel loginRequestModel = request.getBody().orElseThrow(() -> new HttpStatusException(HttpStatus.BAD_REQUEST,"Missing the valid request parameters"));
-//
-//            if(loginRequestModel.getUsername() == null || loginRequestModel.getPassword() == null){
-//                throw new IllegalArgumentException("Username and password cannot be null");
-//            }
-//
-//            AuthenticationRequest<String,String> authRequest = new AuthenticationRequest<>() {
-//                @Override
-//                public String getIdentity() {
-//                    return loginRequestModel.getUsername();
-//                }
-//
-//                @Override
-//                public String getSecret() {
-//                    return loginRequestModel.getPassword();
-//                }
-//            };
-//
-//            return authenticationService.authenticate(request,authRequest);
-//        }catch (Exception e){
-//            log.warn(String.valueOf(e.getCause()));
-//            log.warn("Login failed");
-//            return AuthenticationResponse.failure();
-//        }
-
-
     }
 

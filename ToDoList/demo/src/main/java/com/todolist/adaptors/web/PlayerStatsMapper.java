@@ -1,8 +1,7 @@
 package com.todolist.adaptors.web;
 
 import com.todolist.Models.PlayerStatsModel;
-import com.todolist.adaptors.persistence.jpa.PlayerStatsEntity;
-import jakarta.inject.Singleton;
+import com.todolist.adaptors.persistence.Jpa.PlayerStatsEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "jsr330")

@@ -1,14 +1,14 @@
 package com.todolist.adaptors.web;
 
 
-import com.todolist.Models.taskObjectModel;
-import com.todolist.adaptors.persistence.jpa.TaskEntity;
+import com.todolist.Models.TaskObjectModel;
+import com.todolist.adaptors.persistence.Jpa.TaskEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "jsr330")
 public interface TaskMapper {
 
-    TaskEntity toEntity(taskObjectModel taskObjectModel);
+    TaskEntity toEntity(TaskObjectModel taskObjectModel);
 
-    taskObjectModel toModel(TaskEntity taskEntity);
+    TaskObjectModel toModel(TaskEntity taskEntity);
 }

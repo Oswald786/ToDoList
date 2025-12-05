@@ -37,18 +37,18 @@ async function Register() {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                userName: username,
-                EMAIL: email,
+                username: username,
+                email: email,
                 password: password,
             })
         })
-        await response;
         if (response.status === 200) {
             alert("Registration Successful");
             // setTimeout(() => {
             //     window.location.replace("./LoginPage.html");
             // }, 1000);
             console.log(response.status);
+            console.log(response.statusText);
         } else {
             alert("Registration Failed");
             console.log(response.status);

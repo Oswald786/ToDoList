@@ -1,10 +1,8 @@
 package com.todolist.adaptors.web;
 
-import com.todolist.Models.taskObjectModel;
-import com.todolist.adaptors.persistence.jpa.TaskEntity;
-import io.micronaut.test.annotation.MockBean;
+import com.todolist.Models.TaskObjectModel;
+import com.todolist.adaptors.persistence.Jpa.TaskEntity;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +19,7 @@ class TaskMapperTest {
     @DisplayName("Tests mapper converts model tasks objects to entity's")
     void toEntity() {
         //Arrange
-        taskObjectModel taskObjectModel = new taskObjectModel();
+        TaskObjectModel taskObjectModel = new TaskObjectModel();
         taskObjectModel.setTaskName("Write unit tests");
         taskObjectModel.setTaskType("Engineering");
         taskObjectModel.setTaskLevel("Medium");
@@ -48,18 +46,18 @@ class TaskMapperTest {
         taskEntity.setTaskName("Map to model");
         taskEntity.setTaskType("Engineering");
         taskEntity.setTaskLevel("High");
-        taskEntity.setTaskDescription("Verify TaskEntity -> taskObjectModel mapping");
+        taskEntity.setTaskDescription("Verify TaskEntity -> TaskObjectModel mapping");
 
         //Act
-        taskObjectModel model = taskMapper.toModel(taskEntity);
+        TaskObjectModel model = taskMapper.toModel(taskEntity);
 
         //Assert
         assertEquals(55L, model.getId());
         assertEquals("Map to model", model.getTaskName());
         assertEquals("Engineering", model.getTaskType());
         assertEquals("High", model.getTaskLevel());
-        assertEquals("Verify TaskEntity -> taskObjectModel mapping", model.getTaskDescription());
-        Assertions.assertInstanceOf(taskObjectModel.class, model);
+        assertEquals("Verify TaskEntity -> TaskObjectModel mapping", model.getTaskDescription());
+        Assertions.assertInstanceOf(TaskObjectModel.class, model);
 
 
     }

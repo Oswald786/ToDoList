@@ -1,7 +1,7 @@
 package com.todolist.adaptors.web;
 
-import com.todolist.Models.taskObjectModel;
-import com.todolist.adaptors.persistence.jpa.TaskEntity;
+import com.todolist.Models.TaskObjectModel;
+import com.todolist.adaptors.persistence.Jpa.TaskEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,10 +13,10 @@ class UserMapperTest {
     private final TaskMapper mapper = new TaskMapperImpl();
 
     @Test
-    @DisplayName("toEntity should correctly map all fields from taskObjectModel to TaskEntity")
+    @DisplayName("toEntity should correctly map all fields from TaskObjectModel to TaskEntity")
     void toEntity_mapsAllFieldsCorrectly() {
         // Arrange
-        taskObjectModel model = new taskObjectModel(
+        TaskObjectModel model = new TaskObjectModel(
                 1L,
                 "ETHAN",
                 "Organize Workspace",
@@ -39,7 +39,7 @@ class UserMapperTest {
     }
 
     @Test
-    @DisplayName("toModel should correctly map all fields from TaskEntity to taskObjectModel")
+    @DisplayName("toModel should correctly map all fields from TaskEntity to TaskObjectModel")
     void toModel_mapsAllFieldsCorrectly() {
         // Arrange
         TaskEntity entity = new TaskEntity();
@@ -51,7 +51,7 @@ class UserMapperTest {
         entity.setTaskDescription("Summarize weekly progress and next sprint objectives.");
 
         // Act
-        taskObjectModel model = mapper.toModel(entity);
+        TaskObjectModel model = mapper.toModel(entity);
 
         // Assert
         assertNotNull(model);

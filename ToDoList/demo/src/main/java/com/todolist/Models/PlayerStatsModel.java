@@ -1,8 +1,10 @@
 package com.todolist.Models;
 
+import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.serde.config.annotation.SerdeConfig;
 import lombok.Getter;
 import lombok.Setter;
-
+@Serdeable
 @Getter
 @Setter
 public class PlayerStatsModel {

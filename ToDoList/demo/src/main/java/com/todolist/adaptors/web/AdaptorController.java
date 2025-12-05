@@ -1,6 +1,6 @@
 package com.todolist.adaptors.web;
 
-import com.todolist.Models.taskObjectModel;
+import com.todolist.Models.TaskObjectModel;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import jakarta.inject.Inject;
@@ -14,12 +14,12 @@ public class AdaptorController {
     AdaptorService adaptorService;
 
     @Get("/getTasks")
-    public ArrayList<taskObjectModel> getTasks(){
+    public ArrayList<TaskObjectModel> getTasks(){
         return this.adaptorService.fetchAllTaskModels();
     }
 
     @Get("/getTaskWithId")
-    public taskObjectModel getTaskWithId(int taskId){
+    public TaskObjectModel getTaskWithId(int taskId){
         return this.adaptorService.retrieveTask((long) taskId);
     }
 }

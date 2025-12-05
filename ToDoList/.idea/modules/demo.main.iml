@@ -10,7 +10,7 @@
       <configuration>
         <setting name="validation-enabled" value="true" />
         <datasource-mapping>
-          <factory-entry name="demo.main" value="cd10f519-8062-4a9c-9ada-62cf3c559cd0" />
+          <factory-entry name="demo.main" value="09cb6bf1-fac9-4f6a-a95f-30410b28a8d5" />
         </datasource-mapping>
         <naming-strategy-map>
           <unit-entry name="demo.main" />
