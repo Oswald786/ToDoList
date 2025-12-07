@@ -212,7 +212,6 @@ class AdaptorServicePlayerStatsTest {
         model.setXpToNextLevel(10);
         Authentication fakeAuthentication = mock(Authentication.class);
         when(fakeAuthentication.getName()).thenReturn("TestUser");
-        when(fakeAuthentication.getRoles()).thenReturn(List.of("USER", "ADMIN"));
         PlayerStatsEntity fakeEntity = new PlayerStatsEntity();
         fakeEntity.setPlayerUsername("TestUser");
         fakeEntity.setPlayerLevel(1);
@@ -223,12 +222,12 @@ class AdaptorServicePlayerStatsTest {
         TypedQuery<PlayerStatsEntity> fakeQuery = mock(TypedQuery.class);
         when(entityManager.createQuery("SELECT p FROM PlayerStatsEntity p WHERE p.playerUsername = :username", PlayerStatsEntity.class)).thenReturn(fakeQuery);
         when(fakeQuery.getSingleResult()).thenReturn(fakeEntity);
-        verify(entityManager).merge(entityCaptor.capture());
 
         //Act
         adaptorServicePlayerStats.updatePlayerStats(model, fakeAuthentication);
 
         //Assert
+        verify(entityManager).merge(entityCaptor.capture());
         assertEquals(model.getPlayerUsername(), entityCaptor.getValue().getPlayerUsername());
         assertEquals(model.getPlayerLevel(), entityCaptor.getValue().getPlayerLevel());
         assertEquals(model.getPlayerXp(), entityCaptor.getValue().getPlayerXp());

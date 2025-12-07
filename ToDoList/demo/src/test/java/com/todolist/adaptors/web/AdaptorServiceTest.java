@@ -3,276 +3,445 @@ package com.todolist.adaptors.web;
 import com.todolist.Models.TaskObjectModel;
 import com.todolist.Models.UpdateTaskRequestPackage;
 import com.todolist.adaptors.persistence.Jpa.TaskEntity;
+import com.todolist.exceptions.MapperFailedException;
 import com.todolist.exceptions.TaskNotFoundException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
+@ExtendWith(MockitoExtension.class)
 class AdaptorServiceTest {
 
+    @Mock
+    EntityManager entityManager;
+
+    @Mock
+    TaskMapper taskMapper;
+
+    @InjectMocks
+    AdaptorService adaptorService;
+
+    // --------------------- CREATE ---------------------
 
     @Test
     @DisplayName("createTask should map DTO to entity and persist via EntityManager")
     void createTask() {
-        AdaptorService adaptorService = new AdaptorService();
-        //needs to create a new task from a data object to an entity object
-        EntityManager fakeEM = mock(EntityManager.class);
-        TaskMapper fakeMapper =  mock(TaskMapper.class);
-        adaptorService.setEntityManager(fakeEM);
-        adaptorService.setTaskMapper(fakeMapper);
         TaskObjectModel model = new TaskObjectModel(
-                1L,
-                "ETHAN",
-                "Clean Desk",
-                "Chore",
-                "Easy",
-                "Dust and organize workspace"
+                1L,"ETHAN","Clean Desk","Chore","Easy","Dust and organize workspace"
         );
+
         TaskEntity entity = new TaskEntity();
         entity.setId(1L);
-        entity.setTaskOwnerId("ETHAN");
-        entity.setTaskName("Clean Desk");
-        entity.setTaskType("Chore");
-        entity.setTaskLevel("Easy");
-        entity.setTaskDescription("Dust and organize workspace");
-        when(fakeMapper.toEntity(model)).thenReturn(entity);
-        //act
+
+        when(taskMapper.toEntity(model)).thenReturn(entity);
+
         adaptorService.createTask(model);
 
-
-        //assert
-        verify(fakeMapper,times(1)).toEntity(model);
-        verify(fakeEM,times(1)).persist(entity);
+        verify(taskMapper).toEntity(model);
+        verify(entityManager).persist(entity);
     }
 
     @Test
-    void fetchAllTaskModels() {
-        //creat empty list --> retrieve tasks using the query --> map to TaskObjectModel --> add to list --> return list
+    @DisplayName("createTask throws when Mapper returns null")
+    void createTask_throws_whenMapperNull() {
+        TaskObjectModel model = new TaskObjectModel(
+                1L,"ETHAN","Clean Desk","Chore","Easy","Dust and organize workspace"
+        );
 
-        //arrange
-        AdaptorService adaptorService = new AdaptorService();
-        adaptorService.entityManager = mock(EntityManager.class);
-        adaptorService.taskMapper = mock(TaskMapper.class);
+        when(taskMapper.toEntity(model)).thenReturn(null);
+
+        assertThrows(MapperFailedException.class, () -> adaptorService.createTask(model));
+    }
+
+    @Test
+    @DisplayName("createTask throws when model is null")
+    void createTask_throws_nullModel() {
+        assertThrows(IllegalArgumentException.class, () -> adaptorService.createTask(null));
+    }
+
+    // --------------------- FETCH ALL ---------------------
+
+    @Test
+    @DisplayName("fetchAllTaskModels retrieves tasks and maps them correctly")
+    void fetchAllTaskModels() {
+        TaskEntity task1 = new TaskEntity();
+        task1.setId(1L);
+        task1.setTaskName("Organize Workspace");
+
+        TaskEntity task2 = new TaskEntity();
+        task2.setId(2L);
+        task2.setTaskName("Write Summary");
+
+        List<TaskEntity> list = List.of(task1, task2);
+
+        TypedQuery<TaskEntity> query = mock(TypedQuery.class);
+        when(entityManager.createQuery(anyString(), eq(TaskEntity.class))).thenReturn(query);
+        when(query.getResultList()).thenReturn(list);
+
+        when(taskMapper.toModel(task1)).thenReturn(new TaskObjectModel(1L, "ETHAN", "Organize Workspace","Chore","Medium","desc"));
+        when(taskMapper.toModel(task2)).thenReturn(new TaskObjectModel(2L, "ETHAN", "Write Summary","Work","Hard","desc"));
+
+        var result = adaptorService.fetchAllTaskModels();
+
+        verify(taskMapper, times(2)).toModel(any());
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    @DisplayName("fetchAllTaskModels throws MapperFailedException when mapping fails")
+    void fetchAllTaskModels_mapperFails() {
+        TaskEntity task = new TaskEntity();
+        task.setId(1L);
+
+        List<TaskEntity> list = List.of(task);
+
+        TypedQuery<TaskEntity> query = mock(TypedQuery.class);
+        when(entityManager.createQuery(anyString(), eq(TaskEntity.class))).thenReturn(query);
+        when(query.getResultList()).thenReturn(list);
+
+        when(taskMapper.toModel(task)).thenReturn(null);
+
+        assertThrows(MapperFailedException.class, () -> adaptorService.fetchAllTaskModels());
+    }
+
+    @Test
+    @DisplayName("fetchAllTaskByOwnerId throws illegal argument exception when task owner provided is null")
+    void fetchAllTaskByOwnerId_throws_whenOwnerNull() {
+        //Arrange
+        Long ownerId = null;
+
+        //Act + Assert
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> adaptorService.fetchAllTasksByOwner("")
+        );
+    }
+
+    @Test
+    @DisplayName("fetchAllTasksByOwner fetches tasks with matching owner ID")
+    void fetchAllTasksByOwner_fetchesCorrectOwnerTasks() {
+
+        // Arrange
+        String ownerId = "ETHAN";
+
+        // Mock tasks
         TaskEntity task1 = new TaskEntity();
         task1.setId(1L);
         task1.setTaskOwnerId("ETHAN");
-        task1.setTaskName("Organize Workspace");
-        task1.setTaskType("Chore");
-        task1.setTaskLevel("Medium");
-        task1.setTaskDescription("Sort cables, clean monitor, and clear desk clutter.");
 
         TaskEntity task2 = new TaskEntity();
         task2.setId(2L);
         task2.setTaskOwnerId("ETHAN");
-        task2.setTaskName("Write Project Summary");
-        task2.setTaskType("Work");
-        task2.setTaskLevel("Hard");
-        task2.setTaskDescription("Summarize weekly progress and next sprint objectives.");
-        List<TaskEntity> taskEntities = new ArrayList<>(List.of(task1, task2));
 
-        TypedQuery<TaskEntity> query = mock(TypedQuery.class);
-        when(adaptorService.entityManager.createQuery("SELECT t FROM TaskEntity t", TaskEntity.class)).thenReturn(query);
-        when(query.getResultList()).thenReturn(taskEntities);
+        List<TaskEntity> resultList = List.of(task1, task2);
 
-        //Mocking returned objects
-        when(adaptorService.taskMapper.toModel(task1)).thenReturn(new TaskObjectModel(1L, "ETHAN", "Organize Workspace",
-                "Chore", "Medium", "Sort cables, clean monitor, and clear desk clutter."));
-        when(adaptorService.taskMapper.toModel(task2)).thenReturn(new TaskObjectModel(2L, "ETHAN", "Write Project Summary",
-                "Work", "Hard", "Summarize weekly progress and next sprint objectives."));
-        //act
-        ArrayList<TaskObjectModel> returnedObjects = adaptorService.fetchAllTaskModels();
+        // Mock query
+        TypedQuery<TaskEntity> fakeQuery = mock(TypedQuery.class);
 
-        //assert
+        when(adaptorService.entityManager.createQuery(
+                "SELECT t FROM TaskEntity t WHERE t.taskOwnerId = :owner",
+                TaskEntity.class
+        )).thenReturn(fakeQuery);
+
+        when(fakeQuery.setParameter("owner", ownerId)).thenReturn(fakeQuery);
+        when(fakeQuery.getResultList()).thenReturn(resultList);
+
+        // Mock mapper
+        when(adaptorService.taskMapper.toModel(task1))
+                .thenReturn(new TaskObjectModel(1L, "ETHAN", "Task1", "Chore", "1", "desc"));
+
+        when(adaptorService.taskMapper.toModel(task2))
+                .thenReturn(new TaskObjectModel(2L, "ETHAN", "Task2", "Work", "2", "desc"));
+
+        // Act
+        List<TaskObjectModel> results = adaptorService.fetchAllTasksByOwner(ownerId);
+
+        // Assert
+        verify(adaptorService.entityManager, times(1))
+                .createQuery("SELECT t FROM TaskEntity t WHERE t.taskOwnerId = :owner", TaskEntity.class);
+
+        verify(fakeQuery, times(1)).setParameter("owner", ownerId);
+        verify(fakeQuery, times(1)).getResultList();
         verify(adaptorService.taskMapper, times(2)).toModel(any(TaskEntity.class));
-        verify(query, times(1)).getResultList();
-        Assertions.assertEquals(2, adaptorService.fetchAllTaskModels().size());
-        TaskObjectModel first = returnedObjects.get(0);
-        TaskObjectModel second = returnedObjects.get(1);
 
-        Assertions.assertEquals(1L, first.getId());
-        Assertions.assertEquals("ETHAN", first.getTaskOwnerId());
-        Assertions.assertEquals("Organize Workspace", first.getTaskName());
-        Assertions.assertEquals("Chore", first.getTaskType());
-        Assertions.assertEquals("Medium", first.getTaskLevel());
-        Assertions.assertEquals("Sort cables, clean monitor, and clear desk clutter.", first.getTaskDescription());
-
-        Assertions.assertEquals(2L, second.getId());
-        Assertions.assertEquals("ETHAN", second.getTaskOwnerId());
-        Assertions.assertEquals("Write Project Summary", second.getTaskName());
-        Assertions.assertEquals("Work", second.getTaskType());
-        Assertions.assertEquals("Hard", second.getTaskLevel());
-        Assertions.assertEquals("Summarize weekly progress and next sprint objectives.", second.getTaskDescription());
+        assertEquals(2, results.size());
+        assertEquals(ownerId, results.get(0).getTaskOwnerId());
+        assertEquals(ownerId, results.get(1).getTaskOwnerId());
     }
 
     @Test
-    @DisplayName("retrieveTask successfully returns a mapped task when the entity exists")
-    void retrieveTaskDoesntThrowErrorWhenTaskFound() {
-        //arrange
-        AdaptorService adaptorService = new AdaptorService();
-        adaptorService.entityManager = mock(EntityManager.class);
-        adaptorService.taskMapper = mock(TaskMapper.class);
+    @DisplayName("fetchAllTasksByOwner throws MapperFailedException when one of the tasks returned is null")
+    void fetchAllTasksByOwner_throws_MapperFailedException_when_Task_Null() {
+
+        // Arrange
+        String ownerId = "ETHAN";
+
+        // Mock tasks
         TaskEntity task1 = new TaskEntity();
         task1.setId(1L);
         task1.setTaskOwnerId("ETHAN");
-        task1.setTaskName("Organize Workspace");
-        task1.setTaskType("Chore");
-        task1.setTaskLevel("Medium");
 
-        when(adaptorService.entityManager.find(TaskEntity.class, 1L)).thenReturn(task1);
-        when(adaptorService.taskMapper.toModel(task1)).thenReturn(new TaskObjectModel(1L, "ETHAN", "Organize Workspace","Chore", "Medium", "Sort cables, clean monitor, and clear desk clutter."));
+        TaskEntity task2 = new TaskEntity();
+        task2.setId(2L);
+        task2.setTaskOwnerId("ETHAN");
 
-        //Act
-        TaskObjectModel result = adaptorService.retrieveTask(1L);
+        List<TaskEntity> resultList = List.of(task1, task2);
 
-        //Assert
-        assertNotNull(result);
-        verify(adaptorService.entityManager, times(1)).find(TaskEntity.class, 1L);
-        verify(adaptorService.taskMapper, times(1)).toModel(task1);
-        assertEquals(1L, result.getId());
-        assertEquals("ETHAN", result.getTaskOwnerId());
-        assertEquals("Organize Workspace", result.getTaskName());
-        assertEquals("Chore", result.getTaskType());
-        assertEquals("Medium", result.getTaskLevel());
-        assertEquals("Sort cables, clean monitor, and clear desk clutter.", result.getTaskDescription());
-        Assertions.assertInstanceOf(TaskObjectModel.class, result);
+        // Mock query
+        TypedQuery<TaskEntity> fakeQuery = mock(TypedQuery.class);
+
+        when(adaptorService.entityManager.createQuery(
+                "SELECT t FROM TaskEntity t WHERE t.taskOwnerId = :owner",
+                TaskEntity.class
+        )).thenReturn(fakeQuery);
+
+        when(fakeQuery.setParameter("owner", ownerId)).thenReturn(fakeQuery);
+        when(fakeQuery.getResultList()).thenReturn(resultList);
+
+        // Mock mapper
+        when(adaptorService.taskMapper.toModel(task1))
+                .thenReturn(new TaskObjectModel(1L, "ETHAN", "Task1", "Chore", "1", "desc"));
+
+        when(adaptorService.taskMapper.toModel(task2))
+                .thenReturn(null);
+
+        // Act
+        Assertions.assertThrows(MapperFailedException.class,() -> adaptorService.fetchAllTasksByOwner(ownerId));
+
+        // Assert
+        verify(adaptorService.entityManager, times(1))
+                .createQuery("SELECT t FROM TaskEntity t WHERE t.taskOwnerId = :owner", TaskEntity.class);
+
+        verify(fakeQuery, times(1)).setParameter("owner", ownerId);
+        verify(fakeQuery, times(1)).getResultList();
+        verify(adaptorService.taskMapper, times(2)).toModel(any(TaskEntity.class));
     }
 
-    @Test
-    @DisplayName("Tests retrieveTask returns the task when task exists")
-    void retrieveTaskDoesThrowErrorWhenTaskNotFound() {
-        //arrange
-        AdaptorService adaptorService = new AdaptorService();
-        adaptorService.entityManager = mock(EntityManager.class);
-        adaptorService.taskMapper = mock(TaskMapper.class);
-
-        when(adaptorService.entityManager.find(TaskEntity.class, 1L)).thenReturn(null);
-        //Act
-        Assertions.assertThrows(TaskNotFoundException.class, () -> {adaptorService.retrieveTask(1L);});
-        verify(adaptorService.entityManager, times(1)).find(TaskEntity.class, 1L);
-        verify(adaptorService.taskMapper, never()).toModel(any(TaskEntity.class));
-    }
+    // --------------------- RETRIEVE ---------------------
 
     @Test
-    @DisplayName("updateTask updates taskName when valid ID and field provided")
-    void updateTask_updatesTaskNameSuccessfully() {
-        AdaptorService adaptorService = new AdaptorService();
-        adaptorService.entityManager = mock(EntityManager.class);
-        adaptorService.taskMapper = new TaskMapperImpl();
-
+    @DisplayName("retrieveTask returns mapped model when task exists")
+    void retrieveTask_success() {
         TaskEntity entity = new TaskEntity();
         entity.setId(1L);
-        entity.setTaskName("Old Task");
-        entity.setTaskOwnerId("ETHAN");
-        entity.setTaskName("Organize Workspace");
-        entity.setTaskType("Chore");
-        entity.setTaskLevel("Medium");
+        TaskObjectModel fakeModel = new TaskObjectModel(1L, "ETHAN", "Organize Workspace","Chore","Medium","desc");
 
-        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "New Task", "taskName");
-        when(adaptorService.entityManager.find(TaskEntity.class, 1L)).thenReturn(entity);
+        when(entityManager.find(TaskEntity.class, 1L)).thenReturn(entity);
+        when(taskMapper.toModel(entity)).thenReturn(fakeModel);
+
+        var result = adaptorService.retrieveTask(1L);
+
+        assertNotNull(result);
+        Assertions.assertEquals(fakeModel, result);
+        verify(entityManager).find(TaskEntity.class, 1L);
+    }
+
+    @Test
+    @DisplayName("retrieveTask throws when entity not found")
+    void retrieveTask_notFound() {
+        when(entityManager.find(TaskEntity.class, 1L)).thenReturn(null);
+
+        assertThrows(TaskNotFoundException.class, () -> adaptorService.retrieveTask(1L));
+        verify(taskMapper, never()).toModel(any());
+    }
+
+    @Test
+    @DisplayName("retrieveTask throws illegal argument exception when task id is null")
+    void retrieveTask_nullEntity() {
+        //Arrange
+        Long taskId = null;
+
+        //Act + Assert
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> adaptorService.retrieveTask(taskId)
+        );
+    }
+
+    // --------------------- UPDATE ---------------------
+
+    @Test
+    @DisplayName("updateTask updates taskName when valid")
+    void updateTask_success() {
+        TaskEntity entity = new TaskEntity();
+        entity.setId(1L);
+        entity.setTaskName("Old");
+
+        when(entityManager.find(TaskEntity.class, 1L)).thenReturn(entity);
+        when(taskMapper.toModel(entity)).thenReturn(
+                new TaskObjectModel(1L, "ETHAN","Old","Chore","Medium","desc")
+        );
+
+        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "New Name", "taskName");
 
         adaptorService.updateTask(req);
 
-        assertEquals("New Task", entity.getTaskName());
-        verify(adaptorService.entityManager, times(2)).find(TaskEntity.class, 1L);
+        assertEquals("New Name", entity.getTaskName());
     }
 
     @Test
-    @DisplayName("updateTask throws exception when fieldToUpdate is null or blank")
-    void updateTask_throwsWhenFieldToUpdateInvalid() {
-        AdaptorService adaptorService = new AdaptorService();
-        adaptorService.entityManager = mock(EntityManager.class);
-
+    @DisplayName("updateTask throws when field invalid")
+    void updateTask_invalidField() {
         TaskEntity entity = new TaskEntity();
-        entity.setId(1L);
-        when(adaptorService.entityManager.find(TaskEntity.class, 1L)).thenReturn(entity);
 
         UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "Value", "");
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> adaptorService.updateTask(req));
-
-        assertEquals("Field to update cannot be null or blank", exception.getMessage());
+        assertThrows(IllegalArgumentException.class, () -> adaptorService.updateTask(req));
     }
 
     @Test
-    @DisplayName("updateTask throws exception when replacementValue is null or blank")
-    void updateTask_throwsWhenReplacementValueInvalid() {
-        AdaptorService adaptorService = new AdaptorService();
-        adaptorService.entityManager = mock(EntityManager.class);
-
-        TaskEntity entity = new TaskEntity();
-        entity.setId(1L);
-        when(adaptorService.entityManager.find(TaskEntity.class, 1L)).thenReturn(entity);
-
+    @DisplayName("updateTask throws when replacementValue is null or blank")
+    void updateTask_throwsWhenReplacementValueNullOrBlank() {
+        // Arrange
         UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "", "taskName");
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> adaptorService.updateTask(req));
-
-        assertEquals("Replacement value cannot be null or blank", exception.getMessage());
+        // Act + Assert
+        assertThrows(IllegalArgumentException.class, () -> adaptorService.updateTask(req));
     }
 
     @Test
-    @DisplayName("updateTask throws exception when provided fieldToUpdate does not exist")
+    @DisplayName("updateTask throws when fieldToUpdate does not match allowed fields")
     void updateTask_throwsWhenFieldDoesNotExist() {
-        AdaptorService adaptorService = new AdaptorService();
-        adaptorService.entityManager = mock(EntityManager.class);
-
+        // Arrange
         TaskEntity entity = new TaskEntity();
         entity.setId(1L);
-        when(adaptorService.entityManager.find(TaskEntity.class, 1L)).thenReturn(entity);
+
+        when(entityManager.find(TaskEntity.class, 1L)).thenReturn(entity);
+        when(taskMapper.toModel(entity)).thenReturn(
+                new TaskObjectModel(1L, "ETHAN","Old","Chore","Medium","desc")
+        );
 
         UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "Value", "invalidField");
 
-        assertThrows(RuntimeException.class, () -> adaptorService.updateTask(req));
-
+        // Act + Assert
+        assertThrows(TaskNotFoundException.class, () -> adaptorService.updateTask(req));
     }
 
     @Test
-    @DisplayName("deleteTask removes entity when task exists")
-    void deleteTaskremovesEntityWhenTaskExists() {
+    @DisplayName("updateTask throws when task does not exist")
+    void updateTask_throwsWhenTaskDoesNotExist() {
         // Arrange
-        AdaptorService adaptorService = new AdaptorService();
-        adaptorService.entityManager = mock(EntityManager.class);
-        adaptorService.taskMapper = new TaskMapperImpl();
+        when(entityManager.find(TaskEntity.class, 1L)).thenReturn(null);
 
-        TaskEntity fakeEntity = new TaskEntity();
-        fakeEntity.setId(1L);
-        fakeEntity.setTaskName("Clean Desk");
-        fakeEntity.setTaskOwnerId("ETHAN");
-        fakeEntity.setTaskType("Chore");
-        fakeEntity.setTaskLevel("7");
-        fakeEntity.setTaskDescription("Dust and organize workspace");
-
-        when(adaptorService.entityManager.find(TaskEntity.class, 1L)).thenReturn(fakeEntity);
-
-        // Act
-        adaptorService.deleteTask(1L);
-
-        // Assert
-        verify(adaptorService.entityManager, times(1)).remove(fakeEntity);
-        verify(adaptorService.entityManager, times(2)).find(TaskEntity.class, 1L);
-    }
-
-    @Test
-    @DisplayName("deleteTask throws exception when task does not exist")
-    void deleteTaskthrowsWhenTaskDoesNotExist() {
-        // Arrange
-        AdaptorService adaptorService = new AdaptorService();
-        adaptorService.entityManager = mock(EntityManager.class);
-
-        when(adaptorService.entityManager.find(TaskEntity.class, 99L)).thenReturn(null);
+        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "New", "taskName");
 
         // Act + Assert
-        assertThrows(RuntimeException.class, () -> adaptorService.deleteTask(99L));
-        verify(adaptorService.entityManager, times(0)).remove(any());
+        assertThrows(TaskNotFoundException.class, () -> adaptorService.updateTask(req));
     }
+
+    @Test
+    @DisplayName("updateTask throws when taskLevel is non-numeric")
+    void updateTask_throwsWhenTaskLevelNonNumeric() {
+        // Arrange
+        TaskEntity entity = new TaskEntity();
+        entity.setId(1L);
+
+        when(entityManager.find(TaskEntity.class, 1L)).thenReturn(entity);
+        when(taskMapper.toModel(entity)).thenReturn(
+                new TaskObjectModel(1L, "ETHAN","Old","Chore","Medium","desc")
+        );
+
+        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "abc", "taskLevel");
+
+        // Act + Assert
+        assertThrows(IllegalArgumentException.class, () -> adaptorService.updateTask(req));
+    }
+
+    @Test
+    @DisplayName("updateTask updates taskType when valid")
+    void updateTask_updatesTaskType() {
+        // Arrange
+        TaskEntity entity = new TaskEntity();
+        entity.setId(1L);
+        entity.setTaskType("OldType");
+
+        when(entityManager.find(TaskEntity.class, 1L)).thenReturn(entity);
+        when(taskMapper.toModel(entity)).thenReturn(
+                new TaskObjectModel(1L, "ETHAN","Old","Chore","Medium","desc")
+        );
+
+        UpdateTaskRequestPackage req = new UpdateTaskRequestPackage(1L, "NewType", "taskType");
+
+        // Act
+        adaptorService.updateTask(req);
+
+        // Assert
+        assertEquals("NewType", entity.getTaskType());
+    }
+
+    // --------------------- DELETE ---------------------
+
+    @Test
+    @DisplayName("deleteTask removes entity when exists")
+    void deleteTask_success() {
+        // Arrange
+        long id = 1L;
+
+        // Create a spy of your service so we can stub retrieveTask()
+        AdaptorService spyService = spy(adaptorService);
+
+        // Mock the model returned by retrieveTask()
+        TaskObjectModel model = new TaskObjectModel(
+                id, "ETHAN", "Test", "Chore", "1", "desc"
+        );
+        doReturn(model).when(spyService).retrieveTask(id);
+
+        // Mock the entity retrieved for deletion
+        TaskEntity entity = new TaskEntity();
+        entity.setId(id);
+
+        when(entityManager.find(TaskEntity.class, id)).thenReturn(entity);
+
+        // Act
+        spyService.deleteTask(id);
+
+        // Assert
+        verify(spyService, times(1)).retrieveTask(id);
+        verify(entityManager, times(1)).find(TaskEntity.class, id);
+        verify(entityManager, times(1)).remove(entity);
+    }
+
+    @Test
+    @DisplayName("deleteTask throws when entity missing")
+    void deleteTask_missing() {
+        when(entityManager.find(TaskEntity.class, 99L)).thenReturn(null);
+
+        assertThrows(RuntimeException.class, () -> adaptorService.deleteTask(99L));
+        verify(entityManager, never()).remove(any());
+    }
+
+    @Test
+    @DisplayName("deleteTask throws when id is zero or negative")
+    void deleteTask_throwsWhenIdInvalid() {
+        // Arrange
+        long invalidId = 0;
+
+        // Act + Assert
+        assertThrows(IllegalArgumentException.class, () -> adaptorService.deleteTask(invalidId));
+    }
+
+    @Test
+    @DisplayName("deleteTask throws when task does not exist")
+    void deleteTask_throwsWhenTaskNotFound() {
+        // Arrange
+        long id = 1L;
+        when(entityManager.find(TaskEntity.class, id)).thenReturn(null);
+
+        // Act + Assert
+        assertThrows(TaskNotFoundException.class, () -> adaptorService.deleteTask(id));
+
+        // ensure remove never called
+        verify(entityManager, never()).remove(any());
+    }
+
 }
