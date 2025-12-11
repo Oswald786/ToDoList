@@ -68,20 +68,21 @@ class AuthControllerTest {
         //Arrange
         UserDetailsModel modelNullUsername = new UserDetailsModel(null, "password123", "USER", "ethan@example.com");
         UserDetailsModel modelBlankUsername = new UserDetailsModel("", "password123", "USER", "ethan@example.com");
+        UserDetailsModel modelPasswordLessThanRequiredCharacters = new UserDetailsModel("ethan123", "short", "USER", "ethan@example.com");
 
         //Act + Assert
         HttpRequest<UserDetailsModel> requestNullUsername = HttpRequest.POST("/v1Authentication/register", modelNullUsername);
 
-        HttpRequest<UserDetailsModel> requestBlankUsername = HttpRequest.POST("/v1Authentication/register", modelNullUsername);
+        HttpRequest<UserDetailsModel> requestBlankUsername = HttpRequest.POST("/v1Authentication/register", modelBlankUsername);
+
+        HttpRequest<UserDetailsModel> requestPasswordLessThanRequiredCharacters = HttpRequest.POST("/v1Authentication/register", modelPasswordLessThanRequiredCharacters);
 
         HttpClientResponseException exceptionNullUsername = Assertions.assertThrows(HttpClientResponseException.class, () -> client.toBlocking().exchange(requestNullUsername, String.class));
         HttpClientResponseException exceptionBlankUsername =Assertions.assertThrows(HttpClientResponseException.class, () -> client.toBlocking().exchange(requestBlankUsername, String.class));
+        HttpClientResponseException exceptionPasswordLessThanRequiredCharacters = Assertions.assertThrows(HttpClientResponseException.class, () -> client.toBlocking().exchange(requestPasswordLessThanRequiredCharacters, String.class));
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exceptionNullUsername.getStatus());
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exceptionBlankUsername.getStatus());
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exceptionPasswordLessThanRequiredCharacters.getStatus());
         Mockito.verify(registrationService, Mockito.never()).register(any(UserDetailsModel.class));
-    }
-
-    @Test
-    void register() {
     }
 }
