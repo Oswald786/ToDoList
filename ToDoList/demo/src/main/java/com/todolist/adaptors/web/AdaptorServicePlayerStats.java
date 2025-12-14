@@ -3,7 +3,7 @@ package com.todolist.adaptors.web;
 import com.todolist.Models.PlayerStatsModel;
 import com.todolist.adaptors.persistence.Jpa.PlayerStatsEntity;
 import com.todolist.exceptions.PermissionDeniedException;
-import com.todolist.exceptions.PlayerStatsNotFound;
+import com.todolist.exceptions.PlayerStatsNotFoundException;
 import io.micronaut.security.authentication.Authentication;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -51,10 +51,10 @@ public class AdaptorServicePlayerStats {
             return entity;
         } catch (NoResultException e) {
             log.warn("No player stats found for user {}", authentication.getName());
-            throw new PlayerStatsNotFound("Player stats not found for user " + authentication.getName());
+            throw new PlayerStatsNotFoundException("Player stats not found for user " + authentication.getName());
         }catch (NonUniqueResultException nonUniqueResultException){
             log.error("Multiple player stats found for user {}", authentication.getName());
-            throw new PlayerStatsNotFound("Multiple player stats found for user " + authentication.getName());
+            throw new PlayerStatsNotFoundException("Multiple player stats found for user " + authentication.getName());
         }
     }
 

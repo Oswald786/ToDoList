@@ -3,10 +3,9 @@ package com.todolist.adaptors.web;
 import com.todolist.Models.PlayerStatsModel;
 import com.todolist.adaptors.persistence.Jpa.PlayerStatsEntity;
 import com.todolist.exceptions.PermissionDeniedException;
-import com.todolist.exceptions.PlayerStatsNotFound;
+import com.todolist.exceptions.PlayerStatsNotFoundException;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.NonUniqueResultException;
@@ -19,8 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.*;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -151,7 +148,7 @@ class AdaptorServicePlayerStatsTest {
     //retrieve player stats testing
 
     @Test
-    @DisplayName("retrievePlayerStats throws PlayerStatsNotFound when no stats are found")
+    @DisplayName("retrievePlayerStats throws PlayerStatsNotFoundException when no stats are found")
     void retrivePlayerStats_throws_PlayerStatsNotFound_when_no_stats_found() {
         //Arrange
         Authentication fakeAuthentication = mock(Authentication.class);
@@ -161,11 +158,11 @@ class AdaptorServicePlayerStatsTest {
         when(fakeQuery.getSingleResult()).thenThrow(NoResultException.class);
 
         //act + assert
-        Assertions.assertThrows(PlayerStatsNotFound.class, () -> adaptorServicePlayerStats.retrievePlayerStats(fakeAuthentication));
+        Assertions.assertThrows(PlayerStatsNotFoundException.class, () -> adaptorServicePlayerStats.retrievePlayerStats(fakeAuthentication));
     }
 
     @Test
-    @DisplayName("retrievePlayerStats throws PlayerStatsNotFound when multiple stats are found")
+    @DisplayName("retrievePlayerStats throws PlayerStatsNotFoundException when multiple stats are found")
     void retrievePlayerStats_throwsPlayerStatsNotFound_whenMultipleStatsFound() {
         //Arrange
         Authentication fakeAuthentication = mock(Authentication.class);
@@ -175,7 +172,7 @@ class AdaptorServicePlayerStatsTest {
         when(fakeQuery.getSingleResult()).thenThrow(NonUniqueResultException.class);
 
         //Act + Assert
-        Assertions.assertThrows(PlayerStatsNotFound.class, () -> adaptorServicePlayerStats.retrievePlayerStats(fakeAuthentication));
+        Assertions.assertThrows(PlayerStatsNotFoundException.class, () -> adaptorServicePlayerStats.retrievePlayerStats(fakeAuthentication));
 
     }
 
@@ -272,7 +269,7 @@ class AdaptorServicePlayerStatsTest {
         when(fakeQuery.getSingleResult()).thenThrow(NoResultException.class);
 
         //Act
-        Assertions.assertThrows(PlayerStatsNotFound.class, () -> adaptorServicePlayerStats.deletePlayerStats(fakeAuthentication));
+        Assertions.assertThrows(PlayerStatsNotFoundException.class, () -> adaptorServicePlayerStats.deletePlayerStats(fakeAuthentication));
 
         verify(entityManager, never()).remove(any());
 
@@ -294,7 +291,7 @@ class AdaptorServicePlayerStatsTest {
         when(fakeQuery.getSingleResult()).thenThrow(NoResultException.class);
 
         //Act
-        Assertions.assertThrows(PlayerStatsNotFound.class, () -> adaptorServicePlayerStats.deletePlayerStats(fakeAuthentication));
+        Assertions.assertThrows(PlayerStatsNotFoundException.class, () -> adaptorServicePlayerStats.deletePlayerStats(fakeAuthentication));
 
         verify(entityManager, never()).remove(any());
 

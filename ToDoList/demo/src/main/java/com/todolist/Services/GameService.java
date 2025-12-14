@@ -8,8 +8,8 @@ import com.todolist.adaptors.web.AdaptorServicePlayerStats;
 import com.todolist.adaptors.web.PlayerStatsMapper;
 import com.todolist.exceptions.MapperFailedException;
 import com.todolist.exceptions.PermissionDeniedException;
-import com.todolist.exceptions.PlayerStatsNotFound;
-import com.todolist.exceptions.PlayerUsernameNotProvided;
+import com.todolist.exceptions.PlayerStatsNotFoundException;
+import com.todolist.exceptions.PlayerUsernameNotProvidedException;
 import io.micronaut.security.authentication.Authentication;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -35,7 +35,7 @@ public class GameService {
             throw new IllegalArgumentException("User details model cannot be null");
         }
         if (userDetailsModel.getUsername() == null || userDetailsModel.getUsername().isBlank()){
-            throw new PlayerUsernameNotProvided("Player username cannot be null or blank");
+            throw new PlayerUsernameNotProvidedException("Player username cannot be null or blank");
         }
         PlayerStatsModel playerStatsModel = new PlayerStatsModel();
         playerStatsModel.setPlayerUsername(userDetailsModel.getUsername());
@@ -111,7 +111,7 @@ public class GameService {
 
     private int calculateNewLevelUpThreshold(PlayerStatsModel playerStatsModel){
         if(playerStatsModel == null){
-            throw new PlayerStatsNotFound("Player stats not found Unable to calculate new level up threshold");
+            throw new PlayerStatsNotFoundException("Player stats not found Unable to calculate new level up threshold");
         }else if(playerStatsModel.getPlayerUsername() == null || playerStatsModel.getPlayerUsername().isEmpty()){
             throw new MapperFailedException("Mapper failed to map player stats to model at calculateNewLevelUpThreshold method.");
         }
@@ -138,7 +138,7 @@ public class GameService {
        }
        PlayerStatsModel playerStatsModel = playerStatsMapper.toModel(adaptorServicePlayerStats.retrievePlayerStats(authentication));
        if(playerStatsModel == null){
-           throw new PlayerStatsNotFound("Player stats not found for user " + authentication.getName() + " at " + ErrorLocation + ".");
+           throw new PlayerStatsNotFoundException("Player stats not found for user " + authentication.getName() + " at " + ErrorLocation + ".");
        }else if(playerStatsModel.getPlayerUsername() == null || playerStatsModel.getPlayerUsername().isEmpty()){
            throw new MapperFailedException("Mapper failed to map player stats to model at " + ErrorLocation + ".");
        }
