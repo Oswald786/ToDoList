@@ -20,13 +20,13 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">135</div>
+<div class="counter">136</div>
 <p>tests</p>
 </div>
 </td>
 <td>
 <div class="infoBox" id="failures">
-<div class="counter">0</div>
+<div class="counter">4</div>
 <p>failures</p>
 </div>
 </td>
@@ -38,7 +38,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">4.815s</div>
+<div class="counter">4.284s</div>
 <p>duration</p>
 </div>
 </td>
@@ -47,8 +47,8 @@
 </div>
 </td>
 <td>
-<div class="infoBox success" id="successRate">
-<div class="percent">100%</div>
+<div class="infoBox failures" id="successRate">
+<div class="percent">97%</div>
 <p>successful</p>
 </div>
 </td>
@@ -58,12 +58,36 @@
 <div class="tab-container">
 <ul class="tabLinks">
 <li>
+<a href="#">Failed tests</a>
+</li>
+<li>
 <a href="#">Packages</a>
 </li>
 <li>
 <a href="#">Classes</a>
 </li>
 </ul>
+<div class="tab">
+<h2>Failed tests</h2>
+<ul class="linkList">
+<li>
+<a href="classes/com.todolist.Controllers.AuthControllerTest.html">AuthControllerTest</a>.
+<a href="classes/com.todolist.Controllers.AuthControllerTest.html#testInvalidRegisterUsernameReturnsInternalServerError()">Returns InternalServiceError code 500 when username is null or blank</a>
+</li>
+<li>
+<a href="classes/com.todolist.Controllers.AuthControllerTest.html">AuthControllerTest</a>.
+<a href="classes/com.todolist.Controllers.AuthControllerTest.html#testValidRegisterReturnsOk()">When client sends a valid request the controller uses the logic to return a response and http 200 ok code.</a>
+</li>
+<li>
+<a href="classes/com.todolist.Controllers.GamePointsControllerLogicTests.html">GamePointsControllerLogicTests</a>.
+<a href="classes/com.todolist.Controllers.GamePointsControllerLogicTests.html#addXpCallsService()">Add XP calls service for task completion</a>
+</li>
+<li>
+<a href="classes/com.todolist.Controllers.GamePointsControllerLogicTests.html">GamePointsControllerLogicTests</a>.
+<a href="classes/com.todolist.Controllers.GamePointsControllerLogicTests.html#retrievePlayerStatsReturnsPlayerStats()">Retrieve player stats returns stats from service</a>
+</li>
+</ul>
+</div>
 <div class="tab">
 <h2>Packages</h2>
 <table>
@@ -79,14 +103,14 @@
 </thead>
 <tbody>
 <tr>
-<td class="success">
-<a href="packages/com.todolist.html">com.todolist</a>
+<td class="failures">
+<a href="packages/com.todolist.Controllers.html">com.todolist.Controllers</a>
 </td>
-<td>9</td>
+<td>10</td>
+<td>4</td>
 <td>0</td>
-<td>0</td>
-<td>1.958s</td>
-<td class="success">100%</td>
+<td>2.433s</td>
+<td class="failures">60%</td>
 </tr>
 <tr>
 <td class="success">
@@ -95,7 +119,7 @@
 <td>41</td>
 <td>0</td>
 <td>0</td>
-<td>0.733s</td>
+<td>0.495s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -105,7 +129,7 @@
 <td>52</td>
 <td>0</td>
 <td>0</td>
-<td>0.403s</td>
+<td>0.352s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -115,7 +139,7 @@
 <td>33</td>
 <td>0</td>
 <td>0</td>
-<td>1.721s</td>
+<td>1.004s</td>
 <td class="success">100%</td>
 </tr>
 </tbody>
@@ -136,33 +160,43 @@
 </thead>
 <tbody>
 <tr>
-<td class="success">
-<a href="classes/com.todolist.AuthControllerTest.html">com.todolist.AuthControllerTest</a>
+<td class="failures">
+<a href="classes/com.todolist.Controllers.AuthControllerTest.html">com.todolist.Controllers.AuthControllerTest</a>
 </td>
 <td>2</td>
+<td>2</td>
+<td>0</td>
+<td>2.232s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/com.todolist.Controllers.GamePointsControllerLogicTests.html">com.todolist.Controllers.GamePointsControllerLogicTests</a>
+</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>0.169s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.Controllers.GamePointsControllerSecurityTest.html">com.todolist.Controllers.GamePointsControllerSecurityTest</a>
+</td>
+<td>1</td>
 <td>0</td>
 <td>0</td>
-<td>1.957s</td>
+<td>0.030s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
 <td class="success">
-<a href="classes/com.todolist.GamePointsControllerTest.html">com.todolist.GamePointsControllerTest</a>
-</td>
-<td>2</td>
-<td>0</td>
-<td>0</td>
-<td>0s</td>
-<td class="success">100%</td>
-</tr>
-<tr>
-<td class="success">
-<a href="classes/com.todolist.TaskManagementControllerTest.html">com.todolist.TaskManagementControllerTest</a>
+<a href="classes/com.todolist.Controllers.TaskManagementControllerTest.html">com.todolist.Controllers.TaskManagementControllerTest</a>
 </td>
 <td>5</td>
 <td>0</td>
 <td>0</td>
-<td>0.001s</td>
+<td>0.002s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -172,7 +206,7 @@
 <td>21</td>
 <td>0</td>
 <td>0</td>
-<td>0.438s</td>
+<td>0.298s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -182,7 +216,7 @@
 <td>20</td>
 <td>0</td>
 <td>0</td>
-<td>0.295s</td>
+<td>0.197s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -192,7 +226,7 @@
 <td>24</td>
 <td>0</td>
 <td>0</td>
-<td>0.299s</td>
+<td>0.246s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -202,7 +236,7 @@
 <td>22</td>
 <td>0</td>
 <td>0</td>
-<td>0.101s</td>
+<td>0.103s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -212,7 +246,7 @@
 <td>2</td>
 <td>0</td>
 <td>0</td>
-<td>0.001s</td>
+<td>0s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -232,7 +266,7 @@
 <td>2</td>
 <td>0</td>
 <td>0</td>
-<td>0s</td>
+<td>0.001s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -242,7 +276,7 @@
 <td>14</td>
 <td>0</td>
 <td>0</td>
-<td>0.085s</td>
+<td>0.081s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -252,7 +286,7 @@
 <td>6</td>
 <td>0</td>
 <td>0</td>
-<td>1.155s</td>
+<td>0.607s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -262,7 +296,7 @@
 <td>9</td>
 <td>0</td>
 <td>0</td>
-<td>0.435s</td>
+<td>0.252s</td>
 <td class="success">100%</td>
 </tr>
 <tr>
@@ -272,7 +306,7 @@
 <td>4</td>
 <td>0</td>
 <td>0</td>
-<td>0.046s</td>
+<td>0.064s</td>
 <td class="success">100%</td>
 </tr>
 </tbody>
@@ -286,7 +320,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 8.14.2</a> at 14 Dec 2025, 01:02:13</p>
+<a href="https://www.gradle.org">Gradle 8.14.2</a> at 16 Dec 2025, 22:24:33</p>
 </div>
 </div>
 </body>
