@@ -12,6 +12,7 @@ import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -29,8 +30,11 @@ class AuthControllerTest {
     @Client("/")
     HttpClient client;
 
-//    @Inject
-//    RegistrationService registrationService;
+    @BeforeEach
+    void setup(){
+        Mockito.reset(registrationService);
+    }
+
 
     //Tests micronaut accepts a valid request
     @Test
@@ -72,7 +76,7 @@ class AuthControllerTest {
         HttpRequest<UserDetailsModel> requestPasswordLessThanRequiredCharacters = HttpRequest.POST("/v1Authentication/register", modelPasswordLessThanRequiredCharacters);
 
         HttpClientResponseException exceptionNullUsername = Assertions.assertThrows(HttpClientResponseException.class, () -> client.toBlocking().exchange(requestNullUsername, String.class));
-        HttpClientResponseException exceptionBlankUsername =Assertions.assertThrows(HttpClientResponseException.class, () -> client.toBlocking().exchange(requestBlankUsername, String.class));
+        HttpClientResponseException exceptionBlankUsername = Assertions.assertThrows(HttpClientResponseException.class, () -> client.toBlocking().exchange(requestBlankUsername, String.class));
         HttpClientResponseException exceptionPasswordLessThanRequiredCharacters = Assertions.assertThrows(HttpClientResponseException.class, () -> client.toBlocking().exchange(requestPasswordLessThanRequiredCharacters, String.class));
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exceptionNullUsername.getStatus());
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exceptionBlankUsername.getStatus());
