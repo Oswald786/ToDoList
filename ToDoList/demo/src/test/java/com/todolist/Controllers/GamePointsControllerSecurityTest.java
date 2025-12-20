@@ -1,6 +1,7 @@
 package com.todolist.Controllers;
 
 import com.todolist.Models.PlayerStatsModel;
+import com.todolist.Models.TaskObjectModel;
 import com.todolist.Services.GameService;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpStatus;
@@ -34,9 +35,6 @@ class GamePointsControllerSecurityTest {
         System.setProperty("micronaut.security.enabled", "true");
     }
 
-    /* -------------------------------------------------
-       SECURITY TESTS
-       ------------------------------------------------- */
 
     @Test
     @DisplayName("Unauthenticated user cannot retrieve player stats")
@@ -54,4 +52,22 @@ class GamePointsControllerSecurityTest {
         Assertions.assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
         Mockito.verifyNoInteractions(gameService);
     }
+
+    @Test
+    @DisplayName("Unauthenticated user cannot add XP")
+    void addXpWithoutAuthIsUnauthorized() {
+
+        HttpRequest<?> request =
+                HttpRequest.POST("/v1GamePoints/AddXP", new TaskObjectModel());
+
+        HttpClientResponseException exception =
+                Assertions.assertThrows(
+                        HttpClientResponseException.class,
+                        () -> client.toBlocking().exchange(request)
+                );
+
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
+        Mockito.verifyNoInteractions(gameService);
+    }
+
 }

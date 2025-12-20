@@ -20,13 +20,13 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">2</div>
+<div class="counter">142</div>
 <p>tests</p>
 </div>
 </td>
 <td>
 <div class="infoBox" id="failures">
-<div class="counter">0</div>
+<div class="counter">1</div>
 <p>failures</p>
 </div>
 </td>
@@ -38,7 +38,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">1.481s</div>
+<div class="counter">4.417s</div>
 <p>duration</p>
 </div>
 </td>
@@ -47,8 +47,8 @@
 </div>
 </td>
 <td>
-<div class="infoBox success" id="successRate">
-<div class="percent">100%</div>
+<div class="infoBox failures" id="successRate">
+<div class="percent">99%</div>
 <p>successful</p>
 </div>
 </td>
@@ -58,12 +58,24 @@
 <div class="tab-container">
 <ul class="tabLinks">
 <li>
+<a href="#">Failed tests</a>
+</li>
+<li>
 <a href="#">Packages</a>
 </li>
 <li>
 <a href="#">Classes</a>
 </li>
 </ul>
+<div class="tab">
+<h2>Failed tests</h2>
+<ul class="linkList">
+<li>
+<a href="classes/com.todolist.Controllers.TaskManagementControllerLogicTest.html">TaskManagementControllerLogicTest</a>.
+<a href="classes/com.todolist.Controllers.TaskManagementControllerLogicTest.html#deleteTask()">Delete task calls service and returns OK</a>
+</li>
+</ul>
+</div>
 <div class="tab">
 <h2>Packages</h2>
 <table>
@@ -79,13 +91,43 @@
 </thead>
 <tbody>
 <tr>
-<td class="success">
+<td class="failures">
 <a href="packages/com.todolist.Controllers.html">com.todolist.Controllers</a>
 </td>
-<td>2</td>
+<td>16</td>
+<td>1</td>
+<td>0</td>
+<td>2.085s</td>
+<td class="failures">93%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.todolist.Services.html">com.todolist.Services</a>
+</td>
+<td>41</td>
 <td>0</td>
 <td>0</td>
-<td>1.481s</td>
+<td>0.498s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.todolist.adaptors.web.html">com.todolist.adaptors.web</a>
+</td>
+<td>52</td>
+<td>0</td>
+<td>0</td>
+<td>0.342s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.todolist.auth.html">com.todolist.auth</a>
+</td>
+<td>33</td>
+<td>0</td>
+<td>0</td>
+<td>1.492s</td>
 <td class="success">100%</td>
 </tr>
 </tbody>
@@ -107,12 +149,162 @@
 <tbody>
 <tr>
 <td class="success">
+<a href="classes/com.todolist.Controllers.AuthControllerTest.html">com.todolist.Controllers.AuthControllerTest</a>
+</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0.224s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
 <a href="classes/com.todolist.Controllers.GamePointsControllerLogicTests.html">com.todolist.Controllers.GamePointsControllerLogicTests</a>
 </td>
 <td>2</td>
 <td>0</td>
 <td>0</td>
-<td>1.481s</td>
+<td>0.061s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.Controllers.GamePointsControllerSecurityTest.html">com.todolist.Controllers.GamePointsControllerSecurityTest</a>
+</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0.045s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/com.todolist.Controllers.TaskManagementControllerLogicTest.html">com.todolist.Controllers.TaskManagementControllerLogicTest</a>
+</td>
+<td>5</td>
+<td>1</td>
+<td>0</td>
+<td>1.695s</td>
+<td class="failures">80%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.Controllers.TaskManagementControllerSecurityTest.html">com.todolist.Controllers.TaskManagementControllerSecurityTest</a>
+</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0.060s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.Services.GameServiceTest.html">com.todolist.Services.GameServiceTest</a>
+</td>
+<td>21</td>
+<td>0</td>
+<td>0</td>
+<td>0.310s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.Services.TaskManagmentServiceTest.html">com.todolist.Services.TaskManagmentServiceTest</a>
+</td>
+<td>20</td>
+<td>0</td>
+<td>0</td>
+<td>0.188s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.adaptors.web.AdaptorServicePlayerStatsTest.html">com.todolist.adaptors.web.AdaptorServicePlayerStatsTest</a>
+</td>
+<td>24</td>
+<td>0</td>
+<td>0</td>
+<td>0.243s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.adaptors.web.AdaptorServiceTest.html">com.todolist.adaptors.web.AdaptorServiceTest</a>
+</td>
+<td>22</td>
+<td>0</td>
+<td>0</td>
+<td>0.096s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.adaptors.web.PlayerStatsMapperTest.html">com.todolist.adaptors.web.PlayerStatsMapperTest</a>
+</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0.001s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.adaptors.web.TaskMapperTest.html">com.todolist.adaptors.web.TaskMapperTest</a>
+</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0.002s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.adaptors.web.UserMapperTest.html">com.todolist.adaptors.web.UserMapperTest</a>
+</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.auth.AuthAdaptorServiceTest.html">com.todolist.auth.AuthAdaptorServiceTest</a>
+</td>
+<td>14</td>
+<td>0</td>
+<td>0</td>
+<td>0.076s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.auth.JwtAuthenticationTest.html">com.todolist.auth.JwtAuthenticationTest</a>
+</td>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>0.980s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.auth.PasswordHasherTest.html">com.todolist.auth.PasswordHasherTest</a>
+</td>
+<td>9</td>
+<td>0</td>
+<td>0</td>
+<td>0.400s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.todolist.auth.RegistrationServiceTest.html">com.todolist.auth.RegistrationServiceTest</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0.036s</td>
 <td class="success">100%</td>
 </tr>
 </tbody>
@@ -126,7 +318,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 8.14.2</a> at 17 Dec 2025, 21:17:34</p>
+<a href="https://www.gradle.org">Gradle 8.14.2</a> at 20 Dec 2025, 15:41:50</p>
 </div>
 </div>
 </body>

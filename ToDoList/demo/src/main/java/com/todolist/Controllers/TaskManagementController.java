@@ -11,6 +11,7 @@ import jakarta.inject.Inject;
 import jakarta.validation.constraints.Null;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Secured({"ADMIN","USER"})
 @Controller("/v1taskManagementController")
@@ -22,12 +23,12 @@ public class TaskManagementController {
     //all fot hese methods need the task owner here as well to ensure that the task is taken or altered by the owner
 
     @Post("/createTask")
-    public void createTask(TaskObjectModel taskObjectModel, @Nullable Authentication authentication){
+    public void createTask(@Body TaskObjectModel taskObjectModel, @Nullable Authentication authentication){
         this.taskManagementService.createTask(taskObjectModel,authentication);
     }
 
     @Get("/getTasks")
-    public ArrayList<TaskObjectModel> getTasks(@Nullable Authentication authentication){
+    public List<TaskObjectModel> getTasks(@Nullable Authentication authentication){
         return this.taskManagementService.fetchAllTasks(authentication);
     }
 
@@ -42,7 +43,7 @@ public class TaskManagementController {
     }
 
     @Delete("/deleteTask")
-    public void deleteTask(long id, @Nullable Authentication authentication){
+    public void deleteTask(@Body long id, @Nullable Authentication authentication){
         this.taskManagementService.deleteTask(id,authentication);
     }
 }
