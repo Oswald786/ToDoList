@@ -79,7 +79,7 @@ dependencies {
 
 
 application {
-    mainClass = "com.todolist.Application"
+    mainClass.set("com.todolist.Application")
 }
 java {
     toolchain {

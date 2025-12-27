@@ -23,4 +23,14 @@ public class ExceptionMessageModel {
 
     public ExceptionMessageModel() {
     }
+
+    @Override
+    public String toString() {
+        return "ExceptionMessageModel{" +
+                "message='" + message + '\'' +
+                ", error='" + error + '\'' +
+                ", timestamp='" + timestamp + '\'' +
+                ", path='" + path + '\'' +
+                '}';
+    }
 }

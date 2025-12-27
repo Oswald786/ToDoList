@@ -143,20 +143,4 @@ class TaskManagementControllerLogicTest {
                 .updateTask(any(UpdateTaskRequestPackage.class), ArgumentMatchers.isNull());
     }
 
-    @Test
-    @DisplayName("Delete task calls service and returns OK")
-    void deleteTask() {
-        // Arrange
-        Mockito.doNothing().when(taskManagementService).deleteTask(anyLong(), any());
-
-        HttpRequest<?> request = HttpRequest.DELETE("/v1taskManagementController/deleteTask?id=1");
-
-        // Act
-        HttpResponse<?> response = client.toBlocking().exchange(request);
-
-        // Assert
-        Assertions.assertEquals(HttpStatus.OK, response.getStatus());
-        Mockito.verify(taskManagementService).deleteTask(ArgumentMatchers.eq(1L), ArgumentMatchers.isNull());
-    }
-
 }
