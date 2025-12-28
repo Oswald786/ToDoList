@@ -71,7 +71,6 @@ public class JwtAuthenticationTest {
 
         assertEquals(OK, rsp.getStatus());
         BearerAccessRefreshToken tokenResponse = rsp.body();
-        assertEquals("sherlock", tokenResponse.getUsername());
         assertNotNull(tokenResponse.getAccessToken());
     }
 

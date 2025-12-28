@@ -248,12 +248,10 @@ async function apiRequest(url, method, body = null) {
 
 function newTaskBuilder(taskName, taskType, taskLevel, taskDescription) {
     return {
-        taskObjectModel: {
             taskName: taskName,
             taskType: taskType,
             taskLevel: taskLevel,
             taskDescription: taskDescription
-        }
     };
 }
 
@@ -302,10 +300,7 @@ async function getTasks() {
 
 //remove a task when selected
 async function removeSelectedTask(taskId) {
-    let taskRemovalPackage = {
-        id: taskId
-    }
-    await apiRequest(`http://localhost:8080/v1taskManagementController/deleteTask`, "DELETE", taskRemovalPackage);
+    await apiRequest(`http://localhost:8080/v1taskManagementController/deleteTask`, "DELETE", taskId);
     currentUser = null;
     await loadTasks();
 }

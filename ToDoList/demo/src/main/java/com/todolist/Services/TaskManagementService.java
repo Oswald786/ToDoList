@@ -35,6 +35,7 @@ public class TaskManagementService {
 
     public void createTask(TaskObjectModel taskObjectModel, Authentication authentication){
             log.info("Task creation in progress");
+            log.info("Auth received in createTask(): {}", authentication);
             if(authentication == null){
                 throw new IllegalStateException("Authentication is null");
             }else if(taskObjectModel == null){

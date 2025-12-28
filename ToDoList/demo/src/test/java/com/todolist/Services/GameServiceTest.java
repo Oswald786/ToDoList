@@ -8,8 +8,8 @@ import com.todolist.adaptors.web.AdaptorServicePlayerStats;
 import com.todolist.adaptors.web.PlayerStatsMapper;
 import com.todolist.exceptions.MapperFailedException;
 import com.todolist.exceptions.PermissionDeniedException;
-import com.todolist.exceptions.PlayerStatsNotFound;
-import com.todolist.exceptions.PlayerUsernameNotProvided;
+import com.todolist.exceptions.PlayerStatsNotFoundException;
+import com.todolist.exceptions.PlayerUsernameNotProvidedException;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.authentication.Authenticator;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -22,11 +22,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @MicronautTest
@@ -72,7 +70,7 @@ class GameServiceTest {
         userDetailsModel.setEmail("email");
 
         //Act + Assert
-        Assertions.assertThrows(PlayerUsernameNotProvided.class,() -> {
+        Assertions.assertThrows(PlayerUsernameNotProvidedException.class,() -> {
             gameService.createPlayerStatsProfile(userDetailsModel);
         });
     }
@@ -88,7 +86,7 @@ class GameServiceTest {
         userDetailsModel.setEmail("email");
 
         //Act + Assert
-        Assertions.assertThrows(PlayerUsernameNotProvided.class,() -> {
+        Assertions.assertThrows(PlayerUsernameNotProvidedException.class,() -> {
             gameService.createPlayerStatsProfile(userDetailsModel);
         });
     }
@@ -568,7 +566,7 @@ class GameServiceTest {
     }
 
     @Test
-    @DisplayName("Throws PlayerStatsNotFound when mapped PlayerStatsModel is null")
+    @DisplayName("Throws PlayerStatsNotFoundException when mapped PlayerStatsModel is null")
     void validatePlayerAuthentication_throwsPlayerStatsNotFound_whenPlayerStatsModelNull() {
         // Arrange
         Authentication authentication = mock(Authentication.class);
@@ -580,7 +578,7 @@ class GameServiceTest {
         when(playerStatsMapper.toModel(fakeEntity)).thenReturn(null);
 
         // Act + Assert
-        Assertions.assertThrows(PlayerStatsNotFound.class, () ->
+        Assertions.assertThrows(PlayerStatsNotFoundException.class, () ->
                 gameService.validatePlayerAuthentication(authentication, "UnitTest: PlayerStatsModel null")
         );
     }

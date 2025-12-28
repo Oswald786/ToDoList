@@ -30,7 +30,7 @@ async function Register() {
 
     //what happens when event listener is added
     try {
-        const url = "http://localhost:8080/v1Home/v1Register";
+        const url = "http://localhost:8080/v1Authentication/register";
         const response = await fetch(url, {
             method: "POST",
             headers: {

@@ -40,7 +40,7 @@ micronaut:
 
 datasources:
   default:
-    url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
+    url: jdbc:oracle:thin:@//host.docker.internal:1521/FREEPDB1
     username: ETHAN
     password: Ethan9901
     driverClassName: oracle.jdbc.OracleDriver

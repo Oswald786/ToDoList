@@ -9,6 +9,7 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 
 @Controller("/v1GamePoints")
@@ -20,13 +21,13 @@ public class GamePointsController {
     GameService gameService;
 
     @Get("/RetrievePlayerStats")
-    public PlayerStatsModel getPlayerLevel(Authentication authentication){
+    public PlayerStatsModel getPlayerLevel(@Nullable Authentication authentication){
         PlayerStatsModel returnedPlayerStats = gameService.getPlayerStats(authentication);
         return returnedPlayerStats;
     }
 
     @Post("/AddXP")
-    public void addXP(@Body TaskObjectModel taskObjectModel, Authentication authentication){
+    public void addXP(@Body TaskObjectModel taskObjectModel, @Nullable Authentication authentication){
         gameService.addXPForTaskCompletion(taskObjectModel, authentication);
     }
 }
