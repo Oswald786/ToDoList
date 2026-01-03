@@ -1,9 +1,0 @@
-services:
-  oracledb:
-    build: .
-    ports:
-      - "1521:1521"
-    environment:
-       ORACLE_PASSWORD: "oracle"
-
-
