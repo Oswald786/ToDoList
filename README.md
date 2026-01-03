@@ -1,168 +1,227 @@
 # Ethan’s Code Guild – ToDo List Game 🎮✅
 
-A **gamified To-Do List application** built with **Micronaut**, **Hibernate/JPA**, and **Oracle Database** (running in Docker).  
-This project demonstrates clean architecture with an **Adapter layer**, **REST APIs**, and **SQL-backed persistence**.  
+A **gamified To-Do List application** built with **Micronaut**, **Hibernate/JPA**, and **Oracle Database Free** (running in Docker).
 
-Completing tasks isn’t just checking boxes — you earn **points, levels, and rewards** as part of a productivity game.
+This project demonstrates:
 
----
+- Clean architecture with an **Adapter layer**
+- **REST APIs**
+- **SQL-backed persistence**
+- Secure, role-based access using **JWT authentication**
 
-## 🚀 Features
-- ✅ Manage tasks: create, update, delete
-- 🎮 Gamified scoring system with rewards
-- 🗄️ Oracle XE database running locally in Docker
-- 🔗 Hibernate + JPA for object–relational mapping
-- 🌐 RESTful APIs (GET/POST/PUT/DELETE)
-- 🧩 Adapter layer for database communication
+Completing tasks isn’t just checking boxes — you earn **XP, levels, and rewards** as part of a productivity game.
 
 ---
 
-## 🛠️ Prerequisites
-- [Java 17+](https://adoptium.net/)  
-- [IntelliJ IDEA](https://www.jetbrains.com/idea/) (Community works; Ultimate adds DB tools/HTTP client)  
-- [Docker](https://www.docker.com/) + [Docker Compose](https://docs.docker.com/compose/)  
-- [Git](https://git-scm.com/)  
-- (Optional) Oracle SQL Developer / IntelliJ Database plugin  
+## ✨ Features
+
+- ✅ Create, update, delete tasks  
+- 🎮 Gamified XP + level progression  
+- 🗄 Oracle Free database in Docker (**service: FREEPDB1**)  
+- 🔐 JWT authentication + role-based access
+  - Tasks are scoped to the logged-in user (via JWT)
+  - **ADMIN** users can see all tasks
+  - Write operations are protected
+- 🌐 RESTful API (GET / POST / PUT / DELETE)
+- 🧩 Adapter layer to isolate database logic
+- 🖥 Static frontend (no frameworks, no Node)
 
 ---
 
-## ⚙️ Setup Instructions
+## 🛠 Tech Stack
 
-### 1. Clone the repository
+**Backend**
+- Java 17
+- Micronaut
+- Hibernate / JPA
+- Oracle JDBC
+
+**Infrastructure**
+- Docker + Docker Compose
+
+**Frontend**
+- Static HTML / JavaScript
+
+---
+
+## ✅ Prerequisites
+
+- Docker / Docker Desktop
+- Git
+- A modern web browser (Chrome, Edge, Firefox)
+
+> Java is only required if you want to run the backend locally.
+
+---
+
+## 🚀 Getting Started (Full Stack)
+
+### 1️⃣ Clone the repository
+
+```bash
 git clone https://github.com/Oswold786/todolist-db.git
 cd todolist-db
-2. Start the Oracle Database with Docker
+2️⃣ Build & start services
+This project runs full-stack via Docker Compose:
+
 bash
 Copy code
 docker compose up --build -d
-This will:
+This starts:
 
-Pull the Oracle Free image
+Oracle DB (FREEPDB1)
 
-Run a container with the DB exposed on port 1521
+Micronaut backend API
 
-Execute the init SQL scripts (/init) to create the schema, user, tables, and seed data
+3️⃣ Verify everything is running
+Backend API:
 
-Check logs until DB is ready:
+arduino
+Copy code
+http://localhost:8080
+Check containers:
 
 bash
 Copy code
-docker logs -f oracledb
-3. Verify Database Connection
+docker compose ps
+View logs:
+
+bash
+Copy code
+docker compose logs -f
+🗄 Database Connection Info (optional)
+If connecting via a DB client:
+
 Host: localhost
 
 Port: 1521
 
-Service name: FREEPDB1 (⚠️ not SID XE)
+Service name: FREEPDB1
 
-User: ETHAN
+Username: DEMO_USER
 
-Password: Ethan@9901
+Password: DEMO_PASSWORD
 
-JDBC URL:
+JDBC:
 
-arduino
+bash
 Copy code
 jdbc:oracle:thin:@//localhost:1521/FREEPDB1
-4. Run the Micronaut Application
-From IntelliJ or terminal:
+Credentials come from the SQL init scripts inside /init.
 
-bash
+🎨 Frontend (Access the App)
+Frontend files live here:
+
 Copy code
-./gradlew run
-Backend will run at:
-👉 http://localhost:8080
+ToDoListFrontEnd/
+Open:
 
-📂 Project Structure
+TaskDashboard.html
+
+LogInPage.html
+
+RegisterPage.html
+
+Simply open the files in your browser — no server required.
+
+Ensure Docker containers are running before using the UI.
+
+🌐 API Endpoints (High Level)
+Authentication (JWT)
+POST /login → returns a JWT
+
+Include token as:
+
+makefile
+Copy code
+Authorization: Bearer <token>
+Tasks
+Ownership rules:
+
+Task owner is determined from the JWT username
+
+USERS can only access their own tasks
+
+ADMINS can see all tasks
+
+Routes:
+
+Get tasks: GET /api/tasks/getTasks
+
+Create task: POST /api/tasks
+
+Get by ID: GET /api/tasks/{id}
+
+Update: PUT /api/tasks/{id}
+
+Delete: DELETE /api/tasks/{id}
+
+📦 Project Structure
 rust
 Copy code
-/init/                   -> SQL scripts (user, tables, seed data)
-/app/                    -> Micronaut application code
-docker-compose.yml       -> Oracle XE container config
-Dockerfile               -> App container (if needed)
-README.md                -> Setup + instructions
-🌐 REST API Endpoints
-List tasks
-bash
-Copy code
-GET http://localhost:8080/api/tasks
-Create a task
-bash
-Copy code
-POST http://localhost:8080/api/tasks
-Content-Type: application/json
-
-{
-  "name": "Write README",
-  "type": "docs",
-  "level": 1,
-  "description": "Add setup instructions"
-}
-Get by ID
-bash
-Copy code
-GET http://localhost:8080/api/tasks/{id}
-Update a task
-bash
-Copy code
-PUT http://localhost:8080/api/tasks/{id}
-Content-Type: application/json
-
-{
-  "name": "Update README",
-  "type": "docs",
-  "level": 2,
-  "description": "Expanded instructions"
-}
-Delete a task
-bash
-Copy code
-DELETE http://localhost:8080/api/tasks/{id}
-🧪 Testing
-Run all tests:
+ToDoList/demo/        -> Micronaut backend
+ToDoListDB/           -> Oracle DB container
+ToDoListDB/init/      -> SQL bootstrap scripts
+ToDoListFrontEnd/     -> Static HTML / JS frontend
+docker-compose.yml    -> Orchestration
+README.md             -> Documentation
+LICENSE               -> MIT License
+🛑 Stopping & Resetting
+Stop services:
 
 bash
 Copy code
-./gradlew test
-⚠️ Troubleshooting
-ORA-12505 (SID not registered)
-Use service name: FREEPDB1 instead of SID XE.
-
-Invalid credentials
-Ensure user ETHAN exists and you’re not connecting with SYSTEM.
-
-Tables missing
-Confirm schema is correct:
-
-sql
-Copy code
-SELECT SYS_CONTEXT('USERENV','CURRENT_SCHEMA') FROM dual;
-Should return ETHAN.
-
-Init scripts didn’t run
-They only run on first container startup. To reset:
+docker compose down
+Reset database (removes data):
 
 bash
 Copy code
 docker compose down -v
+⚠️ Troubleshooting
+ORA-12505 / service not registered
+Use service:
+
+nginx
+Copy code
+FREEPDB1
+(not XE)
+
+Schema empty?
+sql
+Copy code
+SELECT SYS_CONTEXT('USERENV','CURRENT_SCHEMA') FROM dual;
+Should return:
+
+nginx
+Copy code
+ETHAN
+Init scripts didn’t run
+bash
+Copy code
+docker compose down -v
 docker compose up --build -d
+🧠 Future Improvements
+Rename GET /api/tasks/getTasks → GET /api/tasks
+
+Add .env.example for environment variables
+
+Optional lightweight web server for frontend hosting
+
 📜 License
-MIT License © 2025 Ethan Slade
+MIT License © 2025 — Ethan Slade
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+yaml
+Copy code
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+---
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+### 👍 Want me to do one more pass?
+
+We can also:
+
+📌 add screenshots  
+📌 add an architecture diagram  
+📌 add a “How authentication works” section  
+📌 make it recruiter-ready
+
+Tell me what you want and we’ll polish it even further.
